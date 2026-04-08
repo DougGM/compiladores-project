@@ -11,14 +11,23 @@ export const Editor = () => {
     const resultado = traducir(input)
     setOutput(resultado)
   }
+
+  const manejarLimpieza = () => {
+    setInput("")
+    setOutput("")
+  }
+
  return (
     // Contenedor principal de editor
     <div className="flex flex-col gap-4 mt-10">
 
       {/* Contenedor de botón */}
-      <div className="flex justify-center">
+      <div className="flex justify-center gap-3">
         <button onClick={manejarConversion} className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition">
           Convertir
+        </button>
+        <button onClick={manejarLimpieza} className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition">
+          Limpiar
         </button>
       </div>
 
