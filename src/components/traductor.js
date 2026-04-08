@@ -4,6 +4,7 @@ export function traducir(codigo) {
   const lineas = codigo.split("\n");
   let resultado = [];
   let variablesDeclaradas = new Set(); 
+  let pilaSegun = [];
 
   
   const reglas = {
@@ -23,6 +24,17 @@ export function traducir(codigo) {
     si: /^si\s+([a-zA-Z][a-zA-Z0-9]*|\d+(\.\d+)?)\s*(==|!=|>|<|>=|<=)\s*([a-zA-Z][a-zA-Z0-9]*|\d+(\.\d+)?|"[^"]*")\s+entonces$/,
     sino: /^sino$/,
     fin_si: /^fin_si$/,
+
+    // Estructura segun-caso
+    segun: /^seg(?:u|\u00FA)n\s+[a-zA-Z][a-zA-Z0-9]*$/,
+    caso: /^caso\s+(\d+|"[^"]*"|[a-zA-Z][a-zA-Z0-9]*)$/,
+    defecto: /^defecto$/,
+    fin_segun: /^fin_segun$/,
+
+    // Ciclo para
+    paraSinPaso: /^para\s+[a-zA-Z][a-zA-Z0-9]*\s*=\s*\d+\s+hasta\s+\d+$/,
+    paraConPaso: /^para\s+[a-zA-Z][a-zA-Z0-9]*\s*=\s*\d+\s+hasta\s+\d+\s+paso\s+\-?\d+$/,
+    fin_para: /^fin_para$/,
     
     //Ciclo mientras
     mientras: /^mientras\s+([a-zA-Z][a-zA-Z0-9]*|\d+(\.\d+)?)\s*(==|!=|>|<|>=|<=)\s*([a-zA-Z][a-zA-Z0-9]*|\d+(\.\d+)?|"[^"]*")\s+hacer$/,
@@ -78,6 +90,68 @@ export function traducir(codigo) {
       resultado.push(`} else {`);
     } 
     else if (reglas.fin_si.test(l)) {
+      resultado.push(`}`);
+    }
+
+    else if (reglas.segun.test(l)) {
+      const match = l.match(/^seg(?:u|\u00FA)n\s+([a-zA-Z][a-zA-Z0-9]*)$/);
+      resultado.push(`switch (${match[1]}) {`);
+      pilaSegun.push({ casoAbierto: false });
+    }
+    else if (reglas.caso.test(l)) {
+      const contextoSegun = pilaSegun[pilaSegun.length - 1];
+      if (contextoSegun && contextoSegun.casoAbierto) {
+        resultado.push(`break;`);
+      }
+      const match = l.match(reglas.caso);
+      resultado.push(`case ${match[1]}:`);
+      if (contextoSegun) {
+        contextoSegun.casoAbierto = true;
+      }
+    }
+    else if (reglas.defecto.test(l)) {
+      const contextoSegun = pilaSegun[pilaSegun.length - 1];
+      if (contextoSegun && contextoSegun.casoAbierto) {
+        resultado.push(`break;`);
+        contextoSegun.casoAbierto = false;
+      }
+      resultado.push(`default:`);
+    }
+    else if (reglas.fin_segun.test(l)) {
+      const contextoSegun = pilaSegun.pop();
+      if (contextoSegun && contextoSegun.casoAbierto) {
+        resultado.push(`break;`);
+      }
+      resultado.push(`}`);
+    }
+
+    else if (reglas.paraSinPaso.test(l)) {
+      const match = l.match(/^para\s+([a-zA-Z][a-zA-Z0-9]*)\s*=\s*(\d+)\s+hasta\s+(\d+)$/);
+      const variable = match[1];
+      const inicio = match[2];
+      const fin = match[3];
+      if (!variablesDeclaradas.has(variable)) {
+        resultado.push(`for (let ${variable} = ${inicio}; ${variable} <= ${fin}; ${variable}++) {`);
+        variablesDeclaradas.add(variable);
+      } else {
+        resultado.push(`for (${variable} = ${inicio}; ${variable} <= ${fin}; ${variable}++) {`);
+      }
+    }
+    else if (reglas.paraConPaso.test(l)) {
+      const match = l.match(/^para\s+([a-zA-Z][a-zA-Z0-9]*)\s*=\s*(\d+)\s+hasta\s+(\d+)\s+paso\s+(\-?\d+)$/);
+      const variable = match[1];
+      const inicio = match[2];
+      const fin = match[3];
+      const paso = match[4];
+      const operador = Number(paso) < 0 ? ">=" : "<=";
+      if (!variablesDeclaradas.has(variable)) {
+        resultado.push(`for (let ${variable} = ${inicio}; ${variable} ${operador} ${fin}; ${variable} += ${paso}) {`);
+        variablesDeclaradas.add(variable);
+      } else {
+        resultado.push(`for (${variable} = ${inicio}; ${variable} ${operador} ${fin}; ${variable} += ${paso}) {`);
+      }
+    }
+    else if (reglas.fin_para.test(l)) {
       resultado.push(`}`);
     }
 
