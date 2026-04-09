@@ -3,6 +3,64 @@
 
 :root {
   color-scheme: light;
+  --bg-gradient: radial-gradient(circle at top, #dbeafe 0%, #eef2ff 28%, #f8fafc 62%, #e2e8f0 100%);
+  --text-strong: #0f172a;
+  --text-muted: #475569;
+  --card-bg: rgba(255, 255, 255, 0.9);
+  --panel: rgba(255, 255, 255, 0.96);
+  --panel-2: rgba(241, 245, 249, 0.82);
+  --border-soft: rgba(148, 163, 184, 0.34);
+  --code-bg: #ffffff;
+  --code-text: #0f172a;
+  --code-card-bg: #0f172a;
+  --code-card-title: #cbd5e1;
+  --code-card-text: #f8fafc;
+  --shadow-card: 0 24px 58px -36px rgba(15, 23, 42, 0.45);
+  --shadow-soft: 0 14px 32px -25px rgba(15, 23, 42, 0.32);
+  --status-success-bg: #dcfce7;
+  --status-success-text: #166534;
+  --status-success-border: #86efac;
+  --status-error-bg: #fee2e2;
+  --status-error-text: #b91c1c;
+  --status-error-border: #fca5a5;
+  --status-waiting-bg: #fef3c7;
+  --status-waiting-text: #92400e;
+  --status-waiting-border: #fcd34d;
+  --btn-primary-from: #2563eb;
+  --btn-primary-to: #06b6d4;
+  --btn-secondary-bg: #ffffff;
+  --btn-secondary-text: #334155;
+  --btn-secondary-border: rgba(148, 163, 184, 0.42);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg-gradient: radial-gradient(circle at top, #1e293b 0%, #111827 36%, #0f172a 70%, #020617 100%);
+  --text-strong: #e2e8f0;
+  --text-muted: #94a3b8;
+  --card-bg: rgba(15, 23, 42, 0.86);
+  --panel: rgba(15, 23, 42, 0.95);
+  --panel-2: rgba(30, 41, 59, 0.72);
+  --border-soft: rgba(148, 163, 184, 0.28);
+  --code-bg: #0b1120;
+  --code-text: #e2e8f0;
+  --code-card-bg: #020617;
+  --code-card-title: #93c5fd;
+  --code-card-text: #e2e8f0;
+  --shadow-card: 0 24px 58px -32px rgba(2, 6, 23, 0.88);
+  --shadow-soft: 0 16px 35px -22px rgba(2, 6, 23, 0.7);
+  --status-success-bg: rgba(22, 101, 52, 0.28);
+  --status-success-text: #86efac;
+  --status-success-border: rgba(74, 222, 128, 0.35);
+  --status-error-bg: rgba(153, 27, 27, 0.25);
+  --status-error-text: #fca5a5;
+  --status-error-border: rgba(248, 113, 113, 0.35);
+  --status-waiting-bg: rgba(146, 64, 14, 0.3);
+  --status-waiting-text: #fcd34d;
+  --status-waiting-border: rgba(251, 191, 36, 0.35);
+  --btn-secondary-bg: rgba(30, 41, 59, 0.8);
+  --btn-secondary-text: #cbd5e1;
+  --btn-secondary-border: rgba(148, 163, 184, 0.3);
 }
 
 * {
@@ -12,18 +70,148 @@
 body {
   margin: 0;
   font-family: "Manrope", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  color: #0f172a;
-  background: #f1f5f9;
+  color: var(--text-strong);
+  background: #0f172a;
+  transition: color 180ms ease, background-color 180ms ease;
 }
 
 ::selection {
-  background: rgba(59, 130, 246, 0.2);
-  color: #0f172a;
+  background: rgba(59, 130, 246, 0.32);
+  color: var(--text-strong);
+}
+
+.app-shell {
+  min-height: 100vh;
+  background: var(--bg-gradient);
+  color: var(--text-strong);
+  transition: background 220ms ease, color 180ms ease;
 }
 
 .code-editor-field {
   font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
   line-height: 1.45;
+}
+
+.primary-btn,
+.secondary-btn,
+.quick-action-btn {
+  border-radius: 12px;
+  padding: 0.52rem 1rem;
+  border: 1px solid transparent;
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  transition: transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.primary-btn {
+  color: #ffffff;
+  background: linear-gradient(90deg, var(--btn-primary-from), var(--btn-primary-to));
+  box-shadow: 0 12px 22px -16px rgba(2, 132, 199, 0.7);
+}
+
+.secondary-btn {
+  color: var(--btn-secondary-text);
+  border-color: var(--btn-secondary-border);
+  background: var(--btn-secondary-bg);
+}
+
+.quick-action-btn {
+  color: var(--text-muted);
+  border-color: var(--btn-secondary-border);
+  background: var(--btn-secondary-bg);
+  padding: 0.45rem 0.9rem;
+  font-size: 0.78rem;
+}
+
+.primary-btn:hover,
+.secondary-btn:hover,
+.quick-action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-soft);
+}
+
+.primary-btn:disabled,
+.secondary-btn:disabled,
+.quick-action-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  padding: 0.36rem 0.78rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.status-success {
+  background: var(--status-success-bg);
+  color: var(--status-success-text);
+  border-color: var(--status-success-border);
+}
+
+.status-error {
+  background: var(--status-error-bg);
+  color: var(--status-error-text);
+  border-color: var(--status-error-border);
+}
+
+.status-waiting {
+  background: var(--status-waiting-bg);
+  color: var(--status-waiting-text);
+  border-color: var(--status-waiting-border);
+}
+
+.code-panel {
+  display: grid;
+  grid-template-columns: 50px minmax(0, 1fr);
+  border-radius: 14px;
+  border: 1px solid var(--border-soft);
+  background: var(--code-bg);
+  overflow: hidden;
+}
+
+.line-gutter {
+  max-height: 20rem;
+  overflow: hidden;
+  border-right: 1px solid var(--border-soft);
+  background: linear-gradient(180deg, rgba(148, 163, 184, 0.12) 0%, rgba(148, 163, 184, 0.06) 100%);
+  color: var(--text-muted);
+  font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  text-align: right;
+  user-select: none;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.line-gutter span {
+  display: block;
+  padding: 0 0.65rem;
+  height: 1.45em;
+}
+
+.code-area {
+  height: 20rem;
+  width: 100%;
+  resize: none;
+  border: none;
+  padding: 0.75rem 0.9rem;
+  background: transparent;
+  color: var(--code-text);
+  font-size: 0.84rem;
+  outline: none;
+}
+
+.code-area::placeholder {
+  color: color-mix(in srgb, var(--text-muted) 74%, transparent);
 }
 
 textarea::-webkit-scrollbar {
@@ -32,14 +220,14 @@ textarea::-webkit-scrollbar {
 }
 
 textarea::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #94a3b8;
   border-radius: 999px;
   border: 2px solid transparent;
   background-clip: content-box;
 }
 
 textarea::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #64748b;
   border-radius: 999px;
   border: 2px solid transparent;
   background-clip: content-box;

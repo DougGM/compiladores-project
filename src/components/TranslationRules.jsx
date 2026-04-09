@@ -126,9 +126,9 @@ const translationRules = [
 
 export const TranslationRules = () => {
   return (
-    <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <section className="mt-8 rounded-3xl border border-[var(--border-soft)] bg-[var(--card-bg)] p-5 shadow-[var(--shadow-card)]">
       <div className="mb-4">
-        <h2 className="text-xl font-bold text-slate-800">Reglas de traducción</h2>
+        <h2 className="text-xl font-bold text-[var(--text-strong)]">Reglas de traducción</h2>
 
       </div>
 
@@ -137,38 +137,38 @@ export const TranslationRules = () => {
           <details
             key={rule.id}
             open={rule.id === 1}
-            className="rounded-xl border border-slate-200 bg-slate-50/70"
+            className="rounded-2xl border border-[var(--border-soft)] bg-[var(--panel-2)] transition hover:shadow-[var(--shadow-soft)]"
           >
             <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-4 py-3">
               <div className="flex items-center gap-3">
                 <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-blue-500 text-sm font-semibold text-white">
                   {rule.id}
                 </span>
-                <h3 className="text-base font-semibold text-slate-800">{rule.title}</h3>
+                <h3 className="text-base font-semibold text-[var(--text-strong)]">{rule.title}</h3>
               </div>
-              <span className="text-xs font-medium uppercase tracking-wide text-slate-500">
+              <span className="text-xs font-medium uppercase tracking-wide text-[var(--text-muted)]">
                 Ver detalle
               </span>
             </summary>
 
-            <div className="border-t border-slate-200 bg-white p-4">
-              <p className="text-sm leading-relaxed text-slate-600">{rule.description}</p>
+            <div className="border-t border-[var(--border-soft)] bg-[var(--panel)] p-4">
+              <p className="text-sm leading-relaxed text-[var(--text-muted)]">{rule.description}</p>
 
               <div className="mt-4 grid gap-3 lg:grid-cols-2">
-                <article className="rounded-lg border border-slate-200 bg-slate-950/95 p-3">
-                  <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-300">
+                <article className="rounded-xl border border-[var(--border-soft)] bg-[var(--code-card-bg)] p-3">
+                  <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--code-card-title)]">
                     Ejemplos en PseudoJS
                   </h4>
-                  <pre className="overflow-x-auto whitespace-pre-wrap text-sm leading-relaxed text-slate-100">
+                  <pre className="overflow-x-auto whitespace-pre-wrap text-sm leading-relaxed text-[var(--code-card-text)]">
                     <code>{rule.pseudoExamples.join("\n")}</code>
                   </pre>
                 </article>
 
-                <article className="rounded-lg border border-slate-200 bg-slate-950/95 p-3">
-                  <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-300">
+                <article className="rounded-xl border border-[var(--border-soft)] bg-[var(--code-card-bg)] p-3">
+                  <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--code-card-title)]">
                     Traduccion a JavaScript
                   </h4>
-                  <pre className="overflow-x-auto whitespace-pre-wrap text-sm leading-relaxed text-slate-100">
+                  <pre className="overflow-x-auto whitespace-pre-wrap text-sm leading-relaxed text-[var(--code-card-text)]">
                     <code>{rule.jsExamples.join("\n")}</code>
                   </pre>
                 </article>
@@ -180,3 +180,4 @@ export const TranslationRules = () => {
     </section>
   )
 }
+
