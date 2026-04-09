@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { traducir } from "../components/traductor"
+import { TranslationRules } from "./TranslationRules"
 
 
 export const Editor = () => {
@@ -47,6 +48,8 @@ export const Editor = () => {
         </div>
 
       </div>
+
+      <TranslationRules />
     </div>
   )
 }

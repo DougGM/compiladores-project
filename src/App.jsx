@@ -9,7 +9,7 @@ function App() {
       <Header />
       </section>
 
-      <section className=" w-300 h-125 ">
+      <section className="w-300 pb-8">
         <Editor />
       </section>
     </main >
