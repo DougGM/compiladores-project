@@ -6,7 +6,7 @@ export const Header = () => {
   const [mostrar, setMostrar] = useState(false)
 
   return (
-    <header className="relative flex items-center justify-between gap-3 rounded-2xl border border-slate-200/90 bg-white/85 px-4 py-3 shadow-[0_18px_45px_-28px_rgba(15,23,42,0.35)] backdrop-blur md:px-5">
+    <header className="relative z-40 flex items-center justify-between gap-3 overflow-visible rounded-2xl border border-slate-200/90 bg-white/85 px-4 py-3 shadow-[0_18px_45px_-28px_rgba(15,23,42,0.35)] backdrop-blur md:px-5">
       <div className="flex items-center gap-3">
         <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 p-1 shadow-md">
           <img src={Logo} alt="logo" className="h-10 w-10 rounded-lg bg-white object-cover p-1" />
@@ -28,7 +28,7 @@ export const Header = () => {
         </button>
 
         {mostrar && (
-          <div className="absolute right-0 z-20 mt-2 w-52 rounded-xl border border-slate-200 bg-white p-3 shadow-lg">
+          <div className="absolute right-0 top-full z-50 mt-2 w-52 rounded-xl border border-slate-200 bg-white p-3 shadow-xl">
             <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Desarrolladores</p>
             <p className="text-sm font-medium text-slate-800">Douglas Galindo</p>
             <p className="text-sm font-medium text-slate-800">Pedro Cesar Ramos</p>
