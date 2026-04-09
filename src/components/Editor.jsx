@@ -18,6 +18,21 @@ export const Editor = () => {
     setOutput("")
   }
 
+  const manejarCopiarSalida = async () => {
+    if (!output) return
+
+    try {
+      await navigator.clipboard.writeText(output)
+    } catch {
+      const textoTemporal = document.createElement("textarea")
+      textoTemporal.value = output
+      document.body.appendChild(textoTemporal)
+      textoTemporal.select()
+      document.execCommand("copy")
+      document.body.removeChild(textoTemporal)
+    }
+  }
+
  return (
     // Contenedor principal de editor
     <div className="flex flex-col gap-4 mt-10">
@@ -29,6 +44,9 @@ export const Editor = () => {
         </button>
         <button onClick={manejarLimpieza} className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition">
           Limpiar
+        </button>
+        <button onClick={manejarCopiarSalida} className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition">
+          Copiar JS
         </button>
       </div>
 
