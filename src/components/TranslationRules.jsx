@@ -1,3 +1,4 @@
+// Fuente unica de reglas y ejemplos que alimenta la UI de documentacion.
 const translationRules = [
   {
     id: 1,
@@ -133,6 +134,7 @@ export const TranslationRules = () => {
       </div>
 
       <div className="grid gap-4">
+        {/* Renderiza cada regla desde datos para evitar duplicar estructura manualmente. */}
         {translationRules.map((rule) => (
           <details
             key={rule.id}

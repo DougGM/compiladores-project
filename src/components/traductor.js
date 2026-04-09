@@ -1,12 +1,18 @@
 
 
 export function traducir(codigo) {
+  // Divide el texto fuente por lineas para traducir cada instruccion de forma independiente.
   const lineas = codigo.split("\n");
   let resultado = [];
+
+  // Lleva control de variables declaradas para no repetir "let" en reasignaciones.
   let variablesDeclaradas = new Set(); 
+
+  // Pila para administrar el contexto de bloques "segun" y cerrar casos con break.
   let pilaSegun = [];
 
   
+  // Reglas de validacion por tipo de instruccion de PseudoJS.
   const reglas = {
     //identificadores
     asigSimple: /^[a-zA-Z][a-zA-Z0-9]*\s*=\s*([a-zA-Z][a-zA-Z0-9]*|\d+(\.\d+)?|"[^"]*")$/,
@@ -45,8 +51,11 @@ export function traducir(codigo) {
     cierre_hacer: /^mientras\s+([a-zA-Z][a-zA-Z0-9]*|\d+(\.\d+)?)\s*(==|!=|>|<|>=|<=)\s*([a-zA-Z][a-zA-Z0-9]*|\d+(\.\d+)?|"[^"]*")$/
   };
 
+  // Recorre el codigo de arriba hacia abajo y construye la salida JS en el mismo orden.
   for (let linea of lineas) {
     let l = linea.trim();
+
+    // Conserva lineas vacias para mantener legibilidad y correspondencia visual.
     if (l === "") {
       resultado.push("");
       continue;
@@ -93,6 +102,7 @@ export function traducir(codigo) {
       resultado.push(`}`);
     }
 
+    // Traduce estructura "segun" a switch/case y controla break automaticos entre casos.
     else if (reglas.segun.test(l)) {
       const match = l.match(/^seg(?:u|\u00FA)n\s+([a-zA-Z][a-zA-Z0-9]*)$/);
       resultado.push(`switch (${match[1]}) {`);
@@ -125,6 +135,7 @@ export function traducir(codigo) {
       resultado.push(`}`);
     }
 
+    // Traduce ciclo PARA sin paso explicito (incremento de 1).
     else if (reglas.paraSinPaso.test(l)) {
       const match = l.match(/^para\s+([a-zA-Z][a-zA-Z0-9]*)\s*=\s*(\d+)\s+hasta\s+(\d+)$/);
       const variable = match[1];
@@ -137,6 +148,7 @@ export function traducir(codigo) {
         resultado.push(`for (${variable} = ${inicio}; ${variable} <= ${fin}; ${variable}++) {`);
       }
     }
+    // Traduce ciclo PARA con paso configurable y ajusta la condicion segun el signo.
     else if (reglas.paraConPaso.test(l)) {
       const match = l.match(/^para\s+([a-zA-Z][a-zA-Z0-9]*)\s*=\s*(\d+)\s+hasta\s+(\d+)\s+paso\s+(-?\d+)$/);
       const variable = match[1];
@@ -155,6 +167,7 @@ export function traducir(codigo) {
       resultado.push(`}`);
     }
 
+    // Traduce ciclos MIENTRAS y su cierre.
     else if (reglas.mientras.test(l)) {
       const match = l.match(reglas.mientras);
       resultado.push(`while (${match[1]} ${match[3]} ${match[4]}) {`);
@@ -163,6 +176,7 @@ export function traducir(codigo) {
       resultado.push(`}`);
     }
 
+    // Traduce ciclos HACER ... MIENTRAS (equivalente a do...while en JS).
     else if (reglas.hacer.test(l)) {
       resultado.push(`do {`);
     }
@@ -177,5 +191,6 @@ export function traducir(codigo) {
     }
   }
 
+  // Une todas las lineas traducidas en un solo bloque de codigo JavaScript.
   return resultado.join("\n");
 }

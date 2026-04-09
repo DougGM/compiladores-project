@@ -2,8 +2,10 @@
 import { traducir } from "../components/traductor"
 import { TranslationRules } from "./TranslationRules"
 
+// Calcula cuantas lineas mostrar en el contador y en el gutter lateral.
 const obtenerTotalLineas = (texto) => Math.max(1, texto.split("\n").length)
 
+// Detecta la linea donde el traductor reporta un error sintactico.
 const obtenerLineaConError = (traduccion) => {
   const lineas = traduccion.split("\n")
   const indiceError = lineas.findIndex((linea) => linea.trim().startsWith("// Error sint"))
@@ -18,6 +20,7 @@ const PanelCodigo = ({
   placeholder,
   soloLectura = false,
 }) => {
+  // Maneja la logica local del panel: lineas visibles y scroll sincronizado.
   const lineas = obtenerTotalLineas(valor)
   const gutterRef = useRef(null)
 
@@ -57,6 +60,7 @@ const PanelCodigo = ({
 }
 
 export const Editor = () => {
+  // Estado principal del editor: texto fuente, resultado y feedback de acciones.
   const [input, setInput] = useState("")
   const [output, setOutput] = useState("")
   const [copyState, setCopyState] = useState("idle")
@@ -67,6 +71,7 @@ export const Editor = () => {
   const [ultimoConvertido, setUltimoConvertido] = useState(null)
   const timerCopiarRef = useRef(null)
 
+  // Limpia el timeout pendiente al desmontar para evitar efectos colgando.
   useEffect(() => {
     return () => {
       if (timerCopiarRef.current) {
@@ -75,6 +80,7 @@ export const Editor = () => {
     }
   }, [])
 
+  // Muestra feedback temporal al copiar y vuelve a estado neutral automaticamente.
   const actualizarFeedbackCopiado = (estado) => {
     setCopyState(estado)
     if (timerCopiarRef.current) {
@@ -86,6 +92,7 @@ export const Editor = () => {
     }, 1500)
   }
 
+  // Traduce la entrada, guarda el ultimo resultado y actualiza el estado visual.
   const manejarConversion = () => {
     if (!input.trim()) {
       setOutput("")
@@ -116,6 +123,7 @@ export const Editor = () => {
     })
   }
 
+  // Resetea la sesion del editor para iniciar una nueva traduccion desde cero.
   const manejarLimpieza = () => {
     setInput("")
     setOutput("")
@@ -126,6 +134,7 @@ export const Editor = () => {
     })
   }
 
+  // Intenta copiar con Clipboard API y usa fallback para navegadores con soporte limitado.
   const manejarCopiarSalida = async () => {
     if (!output) return
 
@@ -147,6 +156,7 @@ export const Editor = () => {
     }
   }
 
+  // Crea y descarga archivos locales sin depender de backend.
   const descargarArchivo = (contenido, nombreArchivo, tipoMime) => {
     if (!contenido) return
 
@@ -161,6 +171,7 @@ export const Editor = () => {
     URL.revokeObjectURL(urlTemporal)
   }
 
+  // Atajos para descargar entrada y salida con su formato correspondiente.
   const manejarDescargaJS = () => {
     descargarArchivo(output, "traduccion.js", "text/javascript;charset=utf-8")
   }
@@ -169,6 +180,7 @@ export const Editor = () => {
     descargarArchivo(input, "pseudocodigo.txt", "text/plain;charset=utf-8")
   }
 
+  // Restaura la ultima conversion guardada y recalcula su estado de exito/error.
   const manejarUltimoConvertido = () => {
     if (!ultimoConvertido) return
 
@@ -190,6 +202,7 @@ export const Editor = () => {
     })
   }
 
+  // Etiqueta del boton segun el resultado de la accion de copiado.
   const textoBotonCopiar =
     copyState === "copied" ? "Copiado" : copyState === "error" ? "Error al copiar" : "Copiar JS"
 
@@ -263,4 +276,3 @@ export const Editor = () => {
     </div>
   )
 }
-
