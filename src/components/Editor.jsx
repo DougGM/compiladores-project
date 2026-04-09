@@ -1,4 +1,4 @@
-import { useState } from "react"
+﻿import { useState } from "react"
 import { traducir } from "../components/traductor"
 import { TranslationRules } from "./TranslationRules"
 
@@ -36,7 +36,7 @@ export const Editor = () => {
       <section className="rounded-2xl border border-slate-200/90 bg-white/90 p-4 shadow-[0_20px_55px_-38px_rgba(15,23,42,0.35)] backdrop-blur md:p-6">
         <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h2 className="text-lg font-bold tracking-tight text-slate-900 md:text-xl">Editor de traduccion</h2>
+            <h2 className="text-lg font-bold tracking-tight text-slate-900 md:text-xl">Editor de traducción</h2>
             <p className="text-sm text-slate-500">Escribe en PseudoJS y convierte el resultado de forma inmediata.</p>
           </div>
 

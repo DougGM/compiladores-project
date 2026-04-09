@@ -10,15 +10,15 @@ export function traducir(codigo) {
   const reglas = {
     //identificadores
     asigSimple: /^[a-zA-Z][a-zA-Z0-9]*\s*=\s*([a-zA-Z][a-zA-Z0-9]*|\d+(\.\d+)?|"[^"]*")$/,
-    asigOperacion: /^[a-zA-Z][a-zA-Z0-9]*\s*=\s*([a-zA-Z][a-zA-Z0-9]*|\d+(\.\d+)?)(\s*[\+\-\*\/]\s*([a-zA-Z][a-zA-Z0-9]*|\d+(\.\d+)?))*$/,
-    asigParentesis: /^[a-zA-Z][a-zA-Z0-9]*\s*=\s*\(.+\)\s*([\+\-\*\/]\s*([a-zA-Z][a-zA-Z0-9]*|\d+(\.\d+)?))*$/,
+    asigOperacion: /^[a-zA-Z][a-zA-Z0-9]*\s*=\s*([a-zA-Z][a-zA-Z0-9]*|\d+(\.\d+)?)(\s*[+\-*/]\s*([a-zA-Z][a-zA-Z0-9]*|\d+(\.\d+)?))*$/,
+    asigParentesis: /^[a-zA-Z][a-zA-Z0-9]*\s*=\s*\(.+\)\s*([+\-*/]\s*([a-zA-Z][a-zA-Z0-9]*|\d+(\.\d+)?))*$/,
     
     // entrada de datos
     leer: /^leer\s+([a-zA-Z][a-zA-Z0-9]*)$/,
     
     // Salida de datos
     mostrarMensaje: /^mostrar\s+([a-zA-Z][a-zA-Z0-9]*|"[^"]*")$/,
-    mostrarOperacion: /^mostrar\s+([a-zA-Z][a-zA-Z0-9]*|\d+(\.\d+)?|"[^"]*")(\s*[\+\-\*\/]\s*([a-zA-Z][a-zA-Z0-9]*|\d+(\.\d+)?|"[^"]*"))*$/,
+    mostrarOperacion: /^mostrar\s+([a-zA-Z][a-zA-Z0-9]*|\d+(\.\d+)?|"[^"]*")(\s*[+\-*/]\s*([a-zA-Z][a-zA-Z0-9]*|\d+(\.\d+)?|"[^"]*"))*$/,
     
     //Condicional si-sino
     si: /^si\s+([a-zA-Z][a-zA-Z0-9]*|\d+(\.\d+)?)\s*(==|!=|>|<|>=|<=)\s*([a-zA-Z][a-zA-Z0-9]*|\d+(\.\d+)?|"[^"]*")\s+entonces$/,
@@ -33,7 +33,7 @@ export function traducir(codigo) {
 
     // Ciclo para
     paraSinPaso: /^para\s+[a-zA-Z][a-zA-Z0-9]*\s*=\s*\d+\s+hasta\s+\d+$/,
-    paraConPaso: /^para\s+[a-zA-Z][a-zA-Z0-9]*\s*=\s*\d+\s+hasta\s+\d+\s+paso\s+\-?\d+$/,
+    paraConPaso: /^para\s+[a-zA-Z][a-zA-Z0-9]*\s*=\s*\d+\s+hasta\s+\d+\s+paso\s+-?\d+$/,
     fin_para: /^fin_para$/,
     
     //Ciclo mientras
@@ -138,7 +138,7 @@ export function traducir(codigo) {
       }
     }
     else if (reglas.paraConPaso.test(l)) {
-      const match = l.match(/^para\s+([a-zA-Z][a-zA-Z0-9]*)\s*=\s*(\d+)\s+hasta\s+(\d+)\s+paso\s+(\-?\d+)$/);
+      const match = l.match(/^para\s+([a-zA-Z][a-zA-Z0-9]*)\s*=\s*(\d+)\s+hasta\s+(\d+)\s+paso\s+(-?\d+)$/);
       const variable = match[1];
       const inicio = match[2];
       const fin = match[3];
