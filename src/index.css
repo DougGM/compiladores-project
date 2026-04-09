@@ -1,1 +1,46 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap");
 @import "tailwindcss";
+
+:root {
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Manrope", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #0f172a;
+  background: #f1f5f9;
+}
+
+::selection {
+  background: rgba(59, 130, 246, 0.2);
+  color: #0f172a;
+}
+
+.code-editor-field {
+  font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+  line-height: 1.45;
+}
+
+textarea::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+textarea::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+textarea::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}

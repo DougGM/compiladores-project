@@ -1,40 +1,40 @@
 import { useState } from "react"
-import Logo from '../assets/imagenes/umg.ico'
-import Users from '../assets/imagenes/users.png'
+import Logo from "../assets/imagenes/umg.ico"
+import Users from "../assets/imagenes/users.png"
 
 export const Header = () => {
   const [mostrar, setMostrar] = useState(false)
 
   return (
-    
-    <div className='bg-neutral-50 flex justify-between h-16 px-3 py-2  rounded-[10px] items-center border border-slate-200'>
-        <img src={Logo} alt="logo" className='w-10 h-10' />
+    <header className="relative flex items-center justify-between gap-3 rounded-2xl border border-slate-200/90 bg-white/85 px-4 py-3 shadow-[0_18px_45px_-28px_rgba(15,23,42,0.35)] backdrop-blur md:px-5">
+      <div className="flex items-center gap-3">
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 p-1 shadow-md">
+          <img src={Logo} alt="logo" className="h-10 w-10 rounded-lg bg-white object-cover p-1" />
+        </div>
 
-        <h1 className='font-bold text-lg'>PseudoJS</h1>
+        <div>
+          <h1 className="text-lg font-extrabold tracking-tight text-slate-900 md:text-xl">PseudoJS</h1>
+          <p className="text-xs font-medium text-slate-500 md:text-sm">Traductor de pseudocodigo a JavaScript</p>
+        </div>
+      </div>
 
-
-      {/* CONTENEDOR boton desarrolladores */}
       <div className="relative">
-        <button 
-          onClick={() => setMostrar(!mostrar)} 
-          className='bg-neutral-100 size-12 grid place-content-center rounded-lg cursor-pointer hover:bg-neutral-200'
+        <button
+          onClick={() => setMostrar(!mostrar)}
+          className="group grid h-12 w-12 place-content-center rounded-xl border border-slate-200 bg-slate-50 transition duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:bg-white hover:shadow-md"
+          aria-label="Mostrar desarrolladores"
         >
-          <img src={Users} alt="colaboradores" className='w-10 h-10'/>
+          <img src={Users} alt="colaboradores" className="h-10 w-10 rounded-lg object-cover" />
         </button>
 
-        {/* Muestra nombres */}
         {mostrar && (
-          <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-lg shadow-lg p-3">
-            <p className="font-semibold mb-2">Desarrolladores</p>
-            <p className="text-sm">Douglas Galindo</p>
-            <p className="text-sm">Pedro César Ramos</p>
+          <div className="absolute right-0 z-20 mt-2 w-52 rounded-xl border border-slate-200 bg-white p-3 shadow-lg">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Desarrolladores</p>
+            <p className="text-sm font-medium text-slate-800">Douglas Galindo</p>
+            <p className="text-sm font-medium text-slate-800">Pedro Cesar Ramos</p>
           </div>
         )}
       </div>
-
-    </div>
-
+    </header>
   )
-}   
-
-
+}
