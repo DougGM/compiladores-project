@@ -306,13 +306,13 @@ export const Editor = () => {
             <button onClick={manejarLimpieza} className="secondary-btn">
               Limpiar
             </button>
-            <button
+            {/* <button
               onClick={manejarCopiarSalida}
               className="secondary-btn"
               disabled={!output}
             >
               {textoBotonCopiar}
-            </button>
+            </button> */}
           </div>
         </div>
 
@@ -329,9 +329,9 @@ export const Editor = () => {
           >
             Último código convertido
           </button>
-          <button onClick={manejarDescargaJS} className="quick-action-btn" disabled={!output}>
+          {/* <button onClick={manejarDescargaJS} className="quick-action-btn" disabled={!output}>
             Descargar .js
-          </button>
+          </button> */}
           <button onClick={manejarDescargaTXT} className="quick-action-btn" disabled={!input}>
             Descargar .txt
           </button>
