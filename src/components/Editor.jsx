@@ -258,7 +258,7 @@ export const Editor = () => {
           </button>
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-2">
+        <div className="grid gap-4">
           <PanelCodigo
             titulo="PseudoJS"
             tipo="Entrada"
@@ -267,13 +267,14 @@ export const Editor = () => {
             placeholder="Escribir pseudocodigo"
           />
 
-          <PanelCodigo
+          {/* Panel de salida JavaScript comentado por solicitud, sin tocar logica */}
+          {/* <PanelCodigo
             titulo="JavaScript"
             tipo="Salida"
             valor={output}
             soloLectura
             placeholder="Resultado en JavaScript"
-          />
+          /> */}
         </div>
 
         <section className="mt-5 rounded-2xl border border-[var(--border-soft)] bg-[var(--panel-2)] p-3 shadow-[var(--shadow-soft)]">
