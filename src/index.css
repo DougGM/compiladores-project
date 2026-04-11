@@ -242,8 +242,8 @@ textarea::-webkit-scrollbar-thumb:hover {
 }
 
 .token-table-wrap-expanded {
-  min-height: 50vh;
-  max-height: calc(90vh - 7.5rem);
+  min-height: 70vh;
+  max-height: calc(94vh - 3.8rem);
 }
 
 .token-table-header {
@@ -266,7 +266,7 @@ textarea::-webkit-scrollbar-thumb:hover {
 
 .token-modal-card {
   width: min(1120px, 95vw);
-  max-height: 90vh;
+  max-height: 94vh;
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
@@ -280,6 +280,13 @@ textarea::-webkit-scrollbar-thumb:hover {
 
 .token-modal-header {
   cursor: zoom-out;
+  justify-content: flex-end;
+}
+
+.token-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
 }
 
 .token-modal-close {
@@ -359,12 +366,12 @@ textarea::-webkit-scrollbar-thumb:hover {
 @media (max-width: 640px) {
   .token-modal-card {
     width: 96vw;
-    max-height: 92vh;
+    max-height: 95vh;
     padding: 0.72rem;
   }
 
   .token-table-wrap-expanded {
-    min-height: 46vh;
-    max-height: calc(92vh - 8rem);
+    min-height: 72vh;
+    max-height: calc(95vh - 4rem);
   }
 }

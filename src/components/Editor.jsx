@@ -358,9 +358,7 @@ export const Editor = () => {
               onDoubleClick={() => setTablaTokensExpandida(false)}
               title="Doble clic para cerrar"
             >
-              <h3 className="text-base font-semibold text-[var(--text-strong)]">Tabla de Tokens (ampliada)</h3>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-[var(--text-muted)]">Total: {listaTokens.length}</span>
+              <div className="token-modal-actions">
                 <button
                   type="button"
                   className="token-modal-close"
