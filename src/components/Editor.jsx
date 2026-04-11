@@ -62,26 +62,26 @@ const PanelCodigo = ({
 export const Editor = () => {
   // Estado principal del editor: texto fuente, resultado y feedback de acciones.
   const [input, setInput] = useState("")
-  const [output, setOutput] = useState("")
+  const [_output, setOutput] = useState("")
   const [listaTokens, setListaTokens] = useState([])
   const [erroresLexicos, setErroresLexicos] = useState([])
   const [tablaTokensExpandida, setTablaTokensExpandida] = useState(false)
-  const [copyState, setCopyState] = useState("idle")
+  // const [copyState, setCopyState] = useState("idle")
   const [estadoConversion, setEstadoConversion] = useState({
     type: "waiting",
     message: "Esperando entrada",
   })
   const [ultimoConvertido, setUltimoConvertido] = useState(null)
-  const timerCopiarRef = useRef(null)
+  // const timerCopiarRef = useRef(null)
 
-  // Limpia el timeout pendiente al desmontar para evitar efectos colgando.
-  useEffect(() => {
-    return () => {
-      if (timerCopiarRef.current) {
-        clearTimeout(timerCopiarRef.current)
-      }
-    }
-  }, [])
+  // // Limpia el timeout pendiente al desmontar para evitar efectos colgando.
+  // useEffect(() => {
+  //   return () => {
+  //     if (timerCopiarRef.current) {
+  //       clearTimeout(timerCopiarRef.current)
+  //     }
+  //   }
+  // }, [])
 
   // Controla el modal de tabla ampliada: cierre con ESC y bloqueo de scroll de fondo.
   useEffect(() => {
@@ -103,17 +103,17 @@ export const Editor = () => {
     }
   }, [tablaTokensExpandida])
 
-  // Muestra feedback temporal al copiar y vuelve a estado neutral automaticamente.
-  const actualizarFeedbackCopiado = (estado) => {
-    setCopyState(estado)
-    if (timerCopiarRef.current) {
-      clearTimeout(timerCopiarRef.current)
-    }
-
-    timerCopiarRef.current = setTimeout(() => {
-      setCopyState("idle")
-    }, 1500)
-  }
+  // // Muestra feedback temporal al copiar y vuelve a estado neutral automaticamente.
+  // const actualizarFeedbackCopiado = (estado) => {
+  //   setCopyState(estado)
+  //   if (timerCopiarRef.current) {
+  //     clearTimeout(timerCopiarRef.current)
+  //   }
+  //
+  //   timerCopiarRef.current = setTimeout(() => {
+  //     setCopyState("idle")
+  //   }, 1500)
+  // }
 
   // Traduce la entrada, guarda el ultimo resultado y actualiza el estado visual.
   const manejarConversion = () => {
@@ -133,7 +133,7 @@ export const Editor = () => {
     setListaTokens(tokens)
     setErroresLexicos(errores)
     setUltimoConvertido({ input, output: codigoJS, tokens, erroresLexicos: errores })
-    setCopyState("idle")
+    // setCopyState("idle")
 
     const lineaError = obtenerLineaConError(codigoJS)
     if (lineaError !== null) {
@@ -164,34 +164,34 @@ export const Editor = () => {
     setOutput("")
     setListaTokens([])
     setErroresLexicos([])
-    setCopyState("idle")
+    // setCopyState("idle")
     setEstadoConversion({
       type: "waiting",
       message: "Esperando entrada",
     })
   }
 
-  // Intenta copiar con Clipboard API y usa fallback para navegadores con soporte limitado.
-  const manejarCopiarSalida = async () => {
-    if (!output) return
-
-    try {
-      await navigator.clipboard.writeText(output)
-      actualizarFeedbackCopiado("copied")
-    } catch {
-      try {
-        const textoTemporal = document.createElement("textarea")
-        textoTemporal.value = output
-        document.body.appendChild(textoTemporal)
-        textoTemporal.select()
-        document.execCommand("copy")
-        document.body.removeChild(textoTemporal)
-        actualizarFeedbackCopiado("copied")
-      } catch {
-        actualizarFeedbackCopiado("error")
-      }
-    }
-  }
+  // // Intenta copiar con Clipboard API y usa fallback para navegadores con soporte limitado.
+  // const manejarCopiarSalida = async () => {
+  //   if (!output) return
+  //
+  //   try {
+  //     await navigator.clipboard.writeText(output)
+  //     actualizarFeedbackCopiado("copied")
+  //   } catch {
+  //     try {
+  //       const textoTemporal = document.createElement("textarea")
+  //       textoTemporal.value = output
+  //       document.body.appendChild(textoTemporal)
+  //       textoTemporal.select()
+  //       document.execCommand("copy")
+  //       document.body.removeChild(textoTemporal)
+  //       actualizarFeedbackCopiado("copied")
+  //     } catch {
+  //       actualizarFeedbackCopiado("error")
+  //     }
+  //   }
+  // }
 
   // Crea y descarga archivos locales sin depender de backend.
   const descargarArchivo = (contenido, nombreArchivo, tipoMime) => {
@@ -209,9 +209,9 @@ export const Editor = () => {
   }
 
   // Atajos para descargar entrada y salida con su formato correspondiente.
-  const manejarDescargaJS = () => {
-    descargarArchivo(output, "traduccion.js", "text/javascript;charset=utf-8")
-  }
+  // const manejarDescargaJS = () => {
+  //   descargarArchivo(output, "traduccion.js", "text/javascript;charset=utf-8")
+  // }
 
   const manejarDescargaTXT = () => {
     descargarArchivo(input, "pseudocodigo.txt", "text/plain;charset=utf-8")
@@ -250,11 +250,11 @@ export const Editor = () => {
     })
   }
 
-  // Etiqueta del boton segun el resultado de la accion de copiado.
-  const textoBotonCopiar =
-    copyState === "copied" ? "Copiado" : copyState === "error" ? "Error al copiar" : "Copiar JS"
+  // // Etiqueta del boton segun el resultado de la accion de copiado.
+  // const textoBotonCopiar =
+  //   copyState === "copied" ? "Copiado" : copyState === "error" ? "Error al copiar" : "Copiar JS"
 
-  const TablaTokens = ({ expandida = false }) => (
+  const renderTablaTokens = (expandida = false) => (
     <div className={`token-table-wrap ${expandida ? "token-table-wrap-expanded" : ""}`}>
       <table className="token-table">
         <thead>
@@ -295,8 +295,8 @@ export const Editor = () => {
       <section className="rounded-3xl border border-[var(--border-soft)] bg-[var(--card-bg)] p-4 shadow-[var(--shadow-card)] backdrop-blur md:p-6">
         <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h2 className="text-lg font-bold tracking-tight text-[var(--text-strong)] md:text-xl">Editor de traducción</h2>
-            <p className="text-sm text-[var(--text-muted)]">Escribe en PseudoJS y convierte el resultado de forma inmediata.</p>
+            <h2 className="text-lg font-bold tracking-tight text-[var(--text-strong)] md:text-xl"></h2>
+            <p className="text-sm text-[var(--text-muted)]"></p>
           </div>
 
           <div className="flex flex-wrap gap-2">
@@ -366,7 +366,7 @@ export const Editor = () => {
             <span className="text-xs font-medium text-[var(--text-muted)]">Total: {listaTokens.length}</span>
           </div>
 
-          <TablaTokens />
+          {renderTablaTokens()}
         </section>
 
         <section className="mt-5 rounded-2xl border border-[var(--border-soft)] bg-[var(--panel-2)] p-3 shadow-[var(--shadow-soft)]">
@@ -380,9 +380,9 @@ export const Editor = () => {
               <thead>
                 <tr>
                   <th>Error</th>
-                  <th>Linea</th>
+                  <th>Línea</th>
                   <th>Lexema</th>
-                  <th>Descripcion</th>
+                  <th>Descripción</th>
                   <th>Sugerencia</th>
                 </tr>
               </thead>
@@ -432,7 +432,7 @@ export const Editor = () => {
                 </button>
               </div>
             </div>
-            <TablaTokens expandida />
+            {renderTablaTokens(true)}
           </section>
         </div>
       ) : null}
