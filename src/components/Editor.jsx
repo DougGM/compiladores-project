@@ -64,6 +64,7 @@ export const Editor = () => {
   const [input, setInput] = useState("")
   const [output, setOutput] = useState("")
   const [listaTokens, setListaTokens] = useState([])
+  const [tablaTokensExpandida, setTablaTokensExpandida] = useState(false)
   const [copyState, setCopyState] = useState("idle")
   const [estadoConversion, setEstadoConversion] = useState({
     type: "waiting",
@@ -80,6 +81,26 @@ export const Editor = () => {
       }
     }
   }, [])
+
+  // Controla el modal de tabla ampliada: cierre con ESC y bloqueo de scroll de fondo.
+  useEffect(() => {
+    if (!tablaTokensExpandida) return
+
+    const manejarTecla = (evento) => {
+      if (evento.key === "Escape") {
+        setTablaTokensExpandida(false)
+      }
+    }
+
+    const overflowOriginal = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+    document.addEventListener("keydown", manejarTecla)
+
+    return () => {
+      document.body.style.overflow = overflowOriginal
+      document.removeEventListener("keydown", manejarTecla)
+    }
+  }, [tablaTokensExpandida])
 
   // Muestra feedback temporal al copiar y vuelve a estado neutral automaticamente.
   const actualizarFeedbackCopiado = (estado) => {
@@ -211,6 +232,40 @@ export const Editor = () => {
   const textoBotonCopiar =
     copyState === "copied" ? "Copiado" : copyState === "error" ? "Error al copiar" : "Copiar JS"
 
+  const TablaTokens = ({ expandida = false }) => (
+    <div className={`token-table-wrap ${expandida ? "token-table-wrap-expanded" : ""}`}>
+      <table className="token-table">
+        <thead>
+          <tr>
+            <th>Línea</th>
+            <th>Token</th>
+            <th>Lexema</th>
+          </tr>
+        </thead>
+        <tbody>
+          {listaTokens.length === 0 ? (
+            <tr>
+              <td colSpan={3} className="token-empty-row">
+                Sin tokens para mostrar
+              </td>
+            </tr>
+          ) : (
+            listaTokens.map((token, indice) => {
+              const tieneErrorLexico = token.token === "DESCONOCIDO" || token.token === "ERROR"
+              return (
+                <tr key={`${token.linea}-${indice}-${token.lexema}`} className={tieneErrorLexico ? "token-row-error" : ""}>
+                  <td>{token.linea}</td>
+                  <td>{token.token}</td>
+                  <td>{token.lexema}</td>
+                </tr>
+              )
+            })
+          )}
+        </tbody>
+      </table>
+    </div>
+  )
+
   return (
     <div className="flex flex-col gap-6">
       <section className="rounded-3xl border border-[var(--border-soft)] bg-[var(--card-bg)] p-4 shadow-[var(--shadow-card)] backdrop-blur md:p-6">
@@ -278,44 +333,47 @@ export const Editor = () => {
         </div>
 
         <section className="mt-5 rounded-2xl border border-[var(--border-soft)] bg-[var(--panel-2)] p-3 shadow-[var(--shadow-soft)]">
-          <div className="mb-3 flex items-center justify-between gap-2">
+          <div
+            className="token-table-header mb-3 flex items-center justify-between gap-2"
+            onDoubleClick={() => setTablaTokensExpandida(true)}
+            title="Doble clic para ampliar"
+          >
             <h3 className="text-sm font-semibold text-[var(--text-strong)]">Tabla de Tokens</h3>
             <span className="text-xs font-medium text-[var(--text-muted)]">Total: {listaTokens.length}</span>
           </div>
 
-          <div className="token-table-wrap">
-            <table className="token-table">
-              <thead>
-                <tr>
-                  <th>Línea</th>
-                  <th>Token</th>
-                  <th>Lexema</th>
-                </tr>
-              </thead>
-              <tbody>
-                {listaTokens.length === 0 ? (
-                  <tr>
-                    <td colSpan={3} className="token-empty-row">
-                      Sin tokens para mostrar
-                    </td>
-                  </tr>
-                ) : (
-                  listaTokens.map((token, indice) => {
-                    const tieneErrorLexico = token.token === "DESCONOCIDO" || token.token === "ERROR"
-                    return (
-                      <tr key={`${token.linea}-${indice}-${token.lexema}`} className={tieneErrorLexico ? "token-row-error" : ""}>
-                        <td>{token.linea}</td>
-                        <td>{token.token}</td>
-                        <td>{token.lexema}</td>
-                      </tr>
-                    )
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
+          <TablaTokens />
         </section>
       </section>
+
+      {tablaTokensExpandida ? (
+        <div
+          className="token-modal-overlay"
+          onClick={() => setTablaTokensExpandida(false)}
+          role="presentation"
+        >
+          <section className="token-modal-card" onClick={(evento) => evento.stopPropagation()}>
+            <div
+              className="token-table-header token-modal-header"
+              onDoubleClick={() => setTablaTokensExpandida(false)}
+              title="Doble clic para cerrar"
+            >
+              <h3 className="text-base font-semibold text-[var(--text-strong)]">Tabla de Tokens (ampliada)</h3>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-[var(--text-muted)]">Total: {listaTokens.length}</span>
+                <button
+                  type="button"
+                  className="token-modal-close"
+                  onClick={() => setTablaTokensExpandida(false)}
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+            <TablaTokens expandida />
+          </section>
+        </div>
+      ) : null}
 
       <TranslationRules />
     </div>

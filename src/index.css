@@ -241,6 +241,83 @@ textarea::-webkit-scrollbar-thumb:hover {
   background: var(--code-bg);
 }
 
+.token-table-wrap-expanded {
+  min-height: 50vh;
+  max-height: calc(90vh - 7.5rem);
+}
+
+.token-table-header {
+  cursor: zoom-in;
+  user-select: none;
+}
+
+.token-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: color-mix(in srgb, #020617 62%, transparent);
+  backdrop-filter: blur(4px);
+  animation: token-overlay-in 180ms ease-out;
+}
+
+.token-modal-card {
+  width: min(1120px, 95vw);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  border-radius: 16px;
+  border: 1px solid var(--border-soft);
+  background: var(--panel);
+  box-shadow: var(--shadow-card);
+  padding: 0.85rem;
+  animation: token-modal-in 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.token-modal-header {
+  cursor: zoom-out;
+}
+
+.token-modal-close {
+  border-radius: 10px;
+  border: 1px solid var(--btn-secondary-border);
+  background: var(--btn-secondary-bg);
+  color: var(--btn-secondary-text);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.36rem 0.68rem;
+  transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+}
+
+.token-modal-close:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-soft);
+}
+
+@keyframes token-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes token-modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.975);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 .token-table {
   width: 100%;
   border-collapse: collapse;
@@ -277,4 +354,17 @@ textarea::-webkit-scrollbar-thumb:hover {
 
 .token-row-error {
   background: color-mix(in srgb, var(--status-error-bg) 68%, transparent);
+}
+
+@media (max-width: 640px) {
+  .token-modal-card {
+    width: 96vw;
+    max-height: 92vh;
+    padding: 0.72rem;
+  }
+
+  .token-table-wrap-expanded {
+    min-height: 46vh;
+    max-height: calc(92vh - 8rem);
+  }
 }
