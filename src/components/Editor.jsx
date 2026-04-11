@@ -63,6 +63,7 @@ export const Editor = () => {
   // Estado principal del editor: texto fuente, resultado y feedback de acciones.
   const [input, setInput] = useState("")
   const [output, setOutput] = useState("")
+  const [listaTokens, setListaTokens] = useState([])
   const [copyState, setCopyState] = useState("idle")
   const [estadoConversion, setEstadoConversion] = useState({
     type: "waiting",
@@ -96,6 +97,7 @@ export const Editor = () => {
   const manejarConversion = () => {
     if (!input.trim()) {
       setOutput("")
+      setListaTokens([])
       setEstadoConversion({
         type: "waiting",
         message: "Esperando entrada",
@@ -103,12 +105,13 @@ export const Editor = () => {
       return
     }
 
-    const resultado = traducir(input)
-    setOutput(resultado)
-    setUltimoConvertido({ input, output: resultado })
+    const { codigoJS, listaTokens: tokens } = traducir(input)
+    setOutput(codigoJS)
+    setListaTokens(tokens)
+    setUltimoConvertido({ input, output: codigoJS, tokens })
     setCopyState("idle")
 
-    const lineaError = obtenerLineaConError(resultado)
+    const lineaError = obtenerLineaConError(codigoJS)
     if (lineaError !== null) {
       setEstadoConversion({
         type: "error",
@@ -127,6 +130,7 @@ export const Editor = () => {
   const manejarLimpieza = () => {
     setInput("")
     setOutput("")
+    setListaTokens([])
     setCopyState("idle")
     setEstadoConversion({
       type: "waiting",
@@ -186,6 +190,7 @@ export const Editor = () => {
 
     setInput(ultimoConvertido.input)
     setOutput(ultimoConvertido.output)
+    setListaTokens(ultimoConvertido.tokens ?? [])
 
     const lineaError = obtenerLineaConError(ultimoConvertido.output)
     if (lineaError !== null) {
@@ -270,6 +275,45 @@ export const Editor = () => {
             placeholder="Resultado en JavaScript"
           />
         </div>
+
+        <section className="mt-5 rounded-2xl border border-[var(--border-soft)] bg-[var(--panel-2)] p-3 shadow-[var(--shadow-soft)]">
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <h3 className="text-sm font-semibold text-[var(--text-strong)]">Tabla de Tokens</h3>
+            <span className="text-xs font-medium text-[var(--text-muted)]">Total: {listaTokens.length}</span>
+          </div>
+
+          <div className="token-table-wrap">
+            <table className="token-table">
+              <thead>
+                <tr>
+                  <th>Línea</th>
+                  <th>Token</th>
+                  <th>Lexema</th>
+                </tr>
+              </thead>
+              <tbody>
+                {listaTokens.length === 0 ? (
+                  <tr>
+                    <td colSpan={3} className="token-empty-row">
+                      Sin tokens para mostrar
+                    </td>
+                  </tr>
+                ) : (
+                  listaTokens.map((token, indice) => {
+                    const tieneErrorLexico = token.token === "DESCONOCIDO" || token.token === "ERROR"
+                    return (
+                      <tr key={`${token.linea}-${indice}-${token.lexema}`} className={tieneErrorLexico ? "token-row-error" : ""}>
+                        <td>{token.linea}</td>
+                        <td>{token.token}</td>
+                        <td>{token.lexema}</td>
+                      </tr>
+                    )
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
       </section>
 
       <TranslationRules />

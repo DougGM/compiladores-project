@@ -4,12 +4,109 @@ export function traducir(codigo) {
   // Divide el texto fuente por lineas para traducir cada instruccion de forma independiente.
   const lineas = codigo.split("\n");
   let resultado = [];
+  let listaTokens = [];
 
   // Lleva control de variables declaradas para no repetir "let" en reasignaciones.
   let variablesDeclaradas = new Set(); 
 
   // Pila para administrar el contexto de bloques "segun" y cerrar casos con break.
   let pilaSegun = [];
+
+  // Tabla de palabras reservadas y simbolos para clasificacion lexica atomica.
+  const palabrasReservadas = {
+    leer: "LEER",
+    mostrar: "MOSTRAR",
+    si: "SI",
+    entonces: "ENTONCES",
+    sino: "SINO",
+    fin_si: "FIN_SI",
+    segun: "SEGUN",
+    "según": "SEGUN",
+    caso: "CASO",
+    defecto: "DEFECTO",
+    fin_segun: "FIN_SEGUN",
+    para: "PARA",
+    hasta: "HASTA",
+    paso: "PASO",
+    fin_para: "FIN_PARA",
+    mientras: "MIENTRAS",
+    hacer: "HACER",
+    fin_mientras: "FIN_MIENTRAS",
+  };
+
+  const simbolos = {
+    "=": "ASIGNACION",
+    "+": "SUMA",
+    "-": "RESTA",
+    "*": "MULTIPLICACION",
+    "/": "DIVISION",
+    "==": "IGUAL_QUE",
+    "!=": "DIFERENTE_QUE",
+    ">": "MAYOR_QUE",
+    "<": "MENOR_QUE",
+    ">=": "MAYOR_IGUAL_QUE",
+    "<=": "MENOR_IGUAL_QUE",
+    "(": "PARENTESIS_ABRE",
+    ")": "PARENTESIS_CIERRA",
+  };
+
+  // Extrae lexemas atomicos por linea usando regex global y los clasifica por token.
+  const tokenizarLinea = (texto, numeroLinea) => {
+    const tokens = [];
+    const patronLexemas = /"[^"]*"|==|!=|>=|<=|[=+\-*/()<>]|seg\u00FAn|[a-zA-Z_][a-zA-Z0-9_]*|\d+\.\d+|\d+/g;
+    let cursor = 0;
+    let coincidencia = null;
+
+    while ((coincidencia = patronLexemas.exec(texto)) !== null) {
+      if (coincidencia.index > cursor) {
+        const segmento = texto.slice(cursor, coincidencia.index).trim();
+        if (segmento) {
+          tokens.push({
+            token: "DESCONOCIDO",
+            lexema: segmento,
+            linea: numeroLinea,
+          });
+        }
+      }
+
+      const lexema = coincidencia[0];
+      let token = "DESCONOCIDO";
+
+      if (/^"[^"]*"$/.test(lexema)) {
+        token = "CADENA";
+      } else if (/^\d+\.\d+$/.test(lexema)) {
+        token = "DECIMAL";
+      } else if (/^\d+$/.test(lexema)) {
+        token = "ENTERO";
+      } else if (simbolos[lexema]) {
+        token = simbolos[lexema];
+      } else {
+        const reservado = palabrasReservadas[lexema.toLowerCase()];
+        token = reservado || "IDENTIFICADOR";
+      }
+
+      tokens.push({
+        token,
+        lexema,
+        linea: numeroLinea,
+      });
+
+      cursor = patronLexemas.lastIndex;
+    }
+
+    if (cursor < texto.length) {
+      const segmentoFinal = texto.slice(cursor).trim();
+      if (segmentoFinal) {
+        tokens.push({
+          token: "DESCONOCIDO",
+          lexema: segmentoFinal,
+          linea: numeroLinea,
+        });
+      }
+    }
+
+    return tokens;
+  };
 
   
   // Reglas de validacion por tipo de instruccion de PseudoJS.
@@ -52,7 +149,8 @@ export function traducir(codigo) {
   };
 
   // Recorre el codigo de arriba hacia abajo y construye la salida JS en el mismo orden.
-  for (let linea of lineas) {
+  for (let i = 0; i < lineas.length; i++) {
+    const linea = lineas[i];
     let l = linea.trim();
 
     // Conserva lineas vacias para mantener legibilidad y correspondencia visual.
@@ -60,6 +158,8 @@ export function traducir(codigo) {
       resultado.push("");
       continue;
     }
+
+    listaTokens.push(...tokenizarLinea(l, i + 1));
 
     //Asignaciones (Simple, operación y de Paréntesis)
     if (reglas.asigSimple.test(l) || reglas.asigOperacion.test(l) || reglas.asigParentesis.test(l)) {
@@ -192,5 +292,8 @@ export function traducir(codigo) {
   }
 
   // Une todas las lineas traducidas en un solo bloque de codigo JavaScript.
-  return resultado.join("\n");
+  return {
+    codigoJS: resultado.join("\n"),
+    listaTokens,
+  };
 }
