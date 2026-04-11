@@ -64,6 +64,7 @@ export const Editor = () => {
   const [input, setInput] = useState("")
   const [output, setOutput] = useState("")
   const [listaTokens, setListaTokens] = useState([])
+  const [erroresLexicos, setErroresLexicos] = useState([])
   const [tablaTokensExpandida, setTablaTokensExpandida] = useState(false)
   const [copyState, setCopyState] = useState("idle")
   const [estadoConversion, setEstadoConversion] = useState({
@@ -119,6 +120,7 @@ export const Editor = () => {
     if (!input.trim()) {
       setOutput("")
       setListaTokens([])
+      setErroresLexicos([])
       setEstadoConversion({
         type: "waiting",
         message: "Esperando entrada",
@@ -126,10 +128,11 @@ export const Editor = () => {
       return
     }
 
-    const { codigoJS, listaTokens: tokens } = traducir(input)
+    const { codigoJS, listaTokens: tokens, erroresLexicos: errores } = traducir(input)
     setOutput(codigoJS)
     setListaTokens(tokens)
-    setUltimoConvertido({ input, output: codigoJS, tokens })
+    setErroresLexicos(errores)
+    setUltimoConvertido({ input, output: codigoJS, tokens, erroresLexicos: errores })
     setCopyState("idle")
 
     const lineaError = obtenerLineaConError(codigoJS)
@@ -137,6 +140,14 @@ export const Editor = () => {
       setEstadoConversion({
         type: "error",
         message: `Error en linea ${lineaError}`,
+      })
+      return
+    }
+
+    if (errores.length > 0) {
+      setEstadoConversion({
+        type: "error",
+        message: `Errores lexicos: ${errores.length}`,
       })
       return
     }
@@ -152,6 +163,7 @@ export const Editor = () => {
     setInput("")
     setOutput("")
     setListaTokens([])
+    setErroresLexicos([])
     setCopyState("idle")
     setEstadoConversion({
       type: "waiting",
@@ -212,12 +224,22 @@ export const Editor = () => {
     setInput(ultimoConvertido.input)
     setOutput(ultimoConvertido.output)
     setListaTokens(ultimoConvertido.tokens ?? [])
+    const erroresGuardados = ultimoConvertido.erroresLexicos ?? []
+    setErroresLexicos(erroresGuardados)
 
     const lineaError = obtenerLineaConError(ultimoConvertido.output)
     if (lineaError !== null) {
       setEstadoConversion({
         type: "error",
         message: `Error en linea ${lineaError}`,
+      })
+      return
+    }
+
+    if (erroresGuardados.length > 0) {
+      setEstadoConversion({
+        type: "error",
+        message: `Errores lexicos: ${erroresGuardados.length}`,
       })
       return
     }
@@ -343,6 +365,46 @@ export const Editor = () => {
           </div>
 
           <TablaTokens />
+        </section>
+
+        <section className="mt-5 rounded-2xl border border-[var(--border-soft)] bg-[var(--panel-2)] p-3 shadow-[var(--shadow-soft)]">
+          <div className="token-table-header mb-3 flex items-center justify-between gap-2">
+            <h3 className="text-sm font-semibold text-[var(--text-strong)]">Errores lexicos</h3>
+            <span className="text-xs font-medium text-[var(--text-muted)]">Total: {erroresLexicos.length}</span>
+          </div>
+
+          <div className="token-table-wrap">
+            <table className="token-table lex-error-table">
+              <thead>
+                <tr>
+                  <th>Error</th>
+                  <th>Linea</th>
+                  <th>Lexema</th>
+                  <th>Descripcion</th>
+                  <th>Sugerencia</th>
+                </tr>
+              </thead>
+              <tbody>
+                {erroresLexicos.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="token-empty-row">
+                      Sin errores lexicos
+                    </td>
+                  </tr>
+                ) : (
+                  erroresLexicos.map((error) => (
+                    <tr key={`${error.numero}-${error.linea}-${error.lexema}`} className="token-row-error">
+                      <td>{error.numero}</td>
+                      <td>{error.linea}</td>
+                      <td>{error.lexema}</td>
+                      <td>{error.descripcion}</td>
+                      <td>{error.sugerencia}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </section>
       </section>
 

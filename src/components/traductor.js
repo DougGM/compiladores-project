@@ -5,6 +5,8 @@ export function traducir(codigo) {
   const lineas = codigo.split("\n");
   let resultado = [];
   let listaTokens = [];
+  let listaErroresLexicos = [];
+  let contadorErroresLexicos = 0;
 
   // Lleva control de variables declaradas para no repetir "let" en reasignaciones.
   let variablesDeclaradas = new Set(); 
@@ -50,6 +52,57 @@ export function traducir(codigo) {
     ")": "PARENTESIS_CIERRA",
   };
 
+  const construirDiagnosticoLexico = (lexema) => {
+    if (/^"/.test(lexema) || /"$/.test(lexema)) {
+      return {
+        descripcion: `Cadena no valida o sin cierre correcto: ${lexema}`,
+        sugerencia: "Verifica que la cadena tenga comillas dobles de apertura y cierre.",
+      };
+    }
+
+    if (/^[0-9]+[a-zA-Z_]+/.test(lexema)) {
+      return {
+        descripcion: `Identificador invalido: ${lexema}`,
+        sugerencia: "Inicia los identificadores con una letra y usa solo letras, numeros o guion bajo.",
+      };
+    }
+
+    if (/[{}[\],;:]/.test(lexema)) {
+      return {
+        descripcion: `Simbolo no permitido en el lenguaje: ${lexema}`,
+        sugerencia: "Elimina o reemplaza ese simbolo por uno soportado por PseudoJS.",
+      };
+    }
+
+    return {
+      descripcion: `Lexema no reconocido: ${lexema}`,
+      sugerencia: "Revisa ortografia y simbolos para que coincidan con las reglas lexicas definidas.",
+    };
+  };
+
+  const registrarTokenDesconocido = (tokens, lexema, numeroLinea) => {
+    const diagnostico = construirDiagnosticoLexico(lexema);
+    contadorErroresLexicos += 1;
+    const numeroError = `LEX${String(contadorErroresLexicos).padStart(3, "0")}`;
+
+    const errorLexico = {
+      numero: numeroError,
+      linea: numeroLinea,
+      lexema,
+      descripcion: diagnostico.descripcion,
+      sugerencia: diagnostico.sugerencia,
+    };
+
+    listaErroresLexicos.push(errorLexico);
+
+    tokens.push({
+      token: "DESCONOCIDO",
+      lexema,
+      linea: numeroLinea,
+      errorLexico,
+    });
+  };
+
   // Extrae lexemas atomicos por linea usando regex global y los clasifica por token.
   const tokenizarLinea = (texto, numeroLinea) => {
     const tokens = [];
@@ -61,11 +114,7 @@ export function traducir(codigo) {
       if (coincidencia.index > cursor) {
         const segmento = texto.slice(cursor, coincidencia.index).trim();
         if (segmento) {
-          tokens.push({
-            token: "DESCONOCIDO",
-            lexema: segmento,
-            linea: numeroLinea,
-          });
+          registrarTokenDesconocido(tokens, segmento, numeroLinea);
         }
       }
 
@@ -97,11 +146,7 @@ export function traducir(codigo) {
     if (cursor < texto.length) {
       const segmentoFinal = texto.slice(cursor).trim();
       if (segmentoFinal) {
-        tokens.push({
-          token: "DESCONOCIDO",
-          lexema: segmentoFinal,
-          linea: numeroLinea,
-        });
+        registrarTokenDesconocido(tokens, segmentoFinal, numeroLinea);
       }
     }
 
@@ -295,5 +340,6 @@ export function traducir(codigo) {
   return {
     codigoJS: resultado.join("\n"),
     listaTokens,
+    erroresLexicos: listaErroresLexicos,
   };
 }

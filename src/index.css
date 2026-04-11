@@ -363,6 +363,31 @@ textarea::-webkit-scrollbar-thumb:hover {
   background: color-mix(in srgb, var(--status-error-bg) 68%, transparent);
 }
 
+.lex-error-table td {
+  vertical-align: top;
+}
+
+.lex-error-table td:nth-child(1),
+.lex-error-table th:nth-child(1) {
+  width: 92px;
+}
+
+.lex-error-table td:nth-child(2),
+.lex-error-table th:nth-child(2) {
+  width: 82px;
+}
+
+.lex-error-table td:nth-child(3),
+.lex-error-table th:nth-child(3) {
+  width: 150px;
+}
+
+.lex-error-table td:nth-child(4),
+.lex-error-table td:nth-child(5) {
+  min-width: 240px;
+  white-space: normal;
+}
+
 @media (max-width: 640px) {
   .token-modal-card {
     width: 96vw;
