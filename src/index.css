@@ -350,6 +350,11 @@ textarea::-webkit-scrollbar-thumb:hover {
 
 .token-table td:nth-child(1),
 .token-table th:nth-child(1) {
+  width: 72px;
+}
+
+.token-table td:nth-child(2),
+.token-table th:nth-child(2) {
   width: 80px;
 }
 

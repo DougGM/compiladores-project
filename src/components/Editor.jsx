@@ -259,6 +259,7 @@ export const Editor = () => {
       <table className="token-table">
         <thead>
           <tr>
+            <th>No.</th>
             <th>Línea</th>
             <th>Token</th>
             <th>Lexema</th>
@@ -267,7 +268,7 @@ export const Editor = () => {
         <tbody>
           {listaTokens.length === 0 ? (
             <tr>
-              <td colSpan={3} className="token-empty-row">
+              <td colSpan={4} className="token-empty-row">
                 Sin tokens para mostrar
               </td>
             </tr>
@@ -276,6 +277,7 @@ export const Editor = () => {
               const tieneErrorLexico = token.token === "DESCONOCIDO" || token.token === "ERROR"
               return (
                 <tr key={`${token.linea}-${indice}-${token.lexema}`} className={tieneErrorLexico ? "token-row-error" : ""}>
+                  <td>{indice + 1}</td>
                   <td>{token.linea}</td>
                   <td>{token.token}</td>
                   <td>{token.lexema}</td>
