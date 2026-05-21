@@ -42,6 +42,7 @@ export const Header = ({ theme, onToggleTheme }) => {
             <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">Desarrolladores</p>
             <p className="text-sm font-medium text-[var(--text-strong)]">Douglas Galindo</p>
             <p className="text-sm font-medium text-[var(--text-strong)]">Pedro Cesar Ramos</p>
+            <p className="text-sm font-medium text-[var(--text-strong)]">Juan Manuel Zacarias</p>
           </div>
         )}
       </div>

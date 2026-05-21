@@ -62,7 +62,7 @@ const PanelCodigo = ({
 export const Editor = () => {
   // Estado principal del editor: texto fuente, resultado y feedback de acciones.
   const [input, setInput] = useState("")
-  const [_output, setOutput] = useState("")
+  const [output, setOutput] = useState("")
   const [listaTokens, setListaTokens] = useState([])
   const [erroresLexicos, setErroresLexicos] = useState([])
   const [tablaTokensExpandida, setTablaTokensExpandida] = useState(false)
@@ -347,13 +347,13 @@ export const Editor = () => {
           />
 
           {/* Panel de salida JavaScript comentado por solicitud, sin tocar logica */}
-          {/* <PanelCodigo
+          <PanelCodigo
             titulo="JavaScript"
             tipo="Salida"
             valor={output}
             soloLectura
             placeholder="Resultado en JavaScript"
-          /> */}
+          /> 
         </div>
 
         <section className="mt-5 rounded-2xl border border-[var(--border-soft)] bg-[var(--panel-2)] p-3 shadow-[var(--shadow-soft)]">
