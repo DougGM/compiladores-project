@@ -7,7 +7,8 @@
 
 // Imports de React para memorizar el arbol visual, manejar el
 // estado de descarga y referenciar el nodo que se exporta a PNG.
-import { useMemo, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
+import { createPortal } from "react-dom"
 
 // html-to-image convierte un nodo HTML especifico en imagen PNG.
 import { toPng } from "html-to-image"
@@ -326,8 +327,22 @@ const VistaArbol = ({ arbolGramatical, exportRef }) => (
 // para la vista y lo renderiza junto con el boton de descarga.
 export const ArbolSintactico = ({ arbol }) => {
   const [estadoDescarga, setEstadoDescarga] = useState("idle")
+  const [expandido, setExpandido] = useState(false)
   const arbolNormalRef = useRef(null)
+  const arbolExpandidoRef = useRef(null)
   const arbolGramatical = useMemo(() => crearArbolGramatical(arbol), [arbol])
+
+  useEffect(() => {
+    if (!expandido) return
+    const manejarTecla = (e) => { if (e.key === "Escape") setExpandido(false) }
+    const overflowOriginal = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+    document.addEventListener("keydown", manejarTecla)
+    return () => {
+      document.body.style.overflow = overflowOriginal
+      document.removeEventListener("keydown", manejarTecla)
+    }
+  }, [expandido])
 
   // ------------------------------------------------------
   // Descarga PNG
@@ -362,6 +377,13 @@ export const ArbolSintactico = ({ arbol }) => {
         <button
           type="button"
           className="quick-action-btn"
+          onClick={() => setExpandido(true)}
+        >
+          Ampliar
+        </button>
+        <button
+          type="button"
+          className="quick-action-btn"
           onClick={() => descargarPng(arbolNormalRef)}
           disabled={estadoDescarga === "loading"}
         >
@@ -374,6 +396,47 @@ export const ArbolSintactico = ({ arbol }) => {
       ) : null}
 
       <VistaArbol arbolGramatical={arbolGramatical} exportRef={arbolNormalRef} />
+
+      {expandido ? createPortal(
+        <div
+          className="token-modal-overlay"
+          onClick={() => setExpandido(false)}
+          role="presentation"
+        >
+          <section
+            className="token-modal-card"
+            style={{ width: "min(1400px, 98vw)", height: "92vh", maxHeight: "92vh", display: "flex", flexDirection: "column" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="token-modal-header token-modal-actions">
+              <button
+                type="button"
+                className="quick-action-btn"
+                onClick={() => descargarPng(arbolExpandidoRef)}
+                disabled={estadoDescarga === "loading"}
+                style={{ marginRight: "auto" }}
+              >
+                {estadoDescarga === "loading" ? "Generando PNG" : "Descargar PNG"}
+              </button>
+              <button
+                type="button"
+                className="token-modal-close"
+                onClick={() => setExpandido(false)}
+              >
+                Cerrar
+              </button>
+            </div>
+            <div className="syntax-tree-view" style={{ flex: 1, maxHeight: "none", overflow: "auto" }}>
+              <div ref={arbolExpandidoRef} className="syntax-tree-export">
+                <div className="syntax-tree-canvas">
+                  <TreeNode nodo={arbolGramatical} />
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>,
+        document.body
+      ) : null}
     </>
   )
 }
