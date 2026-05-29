@@ -393,6 +393,205 @@ textarea::-webkit-scrollbar-thumb:hover {
   white-space: normal;
 }
 
+.syntax-error-table td {
+  vertical-align: top;
+}
+
+.syntax-error-table td:nth-child(1),
+.syntax-error-table th:nth-child(1) {
+  width: 92px;
+}
+
+.syntax-error-table td:nth-child(2),
+.syntax-error-table th:nth-child(2) {
+  width: 82px;
+}
+
+.syntax-error-table td:nth-child(3),
+.syntax-error-table th:nth-child(3),
+.syntax-error-table td:nth-child(4),
+.syntax-error-table th:nth-child(4) {
+  width: 150px;
+}
+
+.syntax-error-table td:nth-child(5),
+.syntax-error-table td:nth-child(6) {
+  min-width: 240px;
+  white-space: normal;
+}
+
+.syntax-tree-view {
+  max-height: 34rem;
+  overflow: auto;
+  border-radius: 12px;
+  border: 1px solid var(--border-soft);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--code-bg) 94%, var(--panel-2)) 0%, var(--code-bg) 100%);
+  color: var(--code-text);
+  font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  padding: 1.45rem;
+}
+
+.syntax-tree-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.syntax-tree-error {
+  margin: 0 0 0.7rem;
+  color: var(--status-error-text);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.syntax-tree-export {
+  display: inline-flex;
+  min-width: 100%;
+  background: var(--code-bg);
+  padding: 0.2rem;
+}
+
+.syntax-tree-canvas {
+  display: inline-flex;
+  justify-content: center;
+  min-width: 100%;
+  padding: 0.7rem 1.2rem 1.35rem;
+}
+
+.diagram-tree-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  flex: 0 0 auto;
+  min-width: max-content;
+}
+
+.diagram-node-card {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.18rem;
+  min-width: 3.8rem;
+  max-width: 11rem;
+  border-radius: 7px;
+  border: 1.5px solid color-mix(in srgb, #64748b 46%, #93c5fd);
+  background: color-mix(in srgb, #dbeafe 76%, var(--code-bg));
+  box-shadow: 0 8px 16px -18px rgba(15, 23, 42, 0.5);
+  padding: 0.34rem 0.52rem;
+  text-align: center;
+}
+
+.diagram-tree-node-terminal > .diagram-node-card {
+  border-color: color-mix(in srgb, #22c55e 58%, var(--border-soft));
+  background: color-mix(in srgb, #dcfce7 74%, var(--code-bg));
+}
+
+.diagram-tree-node-operator > .diagram-node-card,
+.diagram-tree-node-symbol > .diagram-node-card {
+  border-color: color-mix(in srgb, #f59e0b 68%, var(--border-soft));
+  background: color-mix(in srgb, #fef3c7 78%, var(--code-bg));
+}
+
+.diagram-tree-node-special > .diagram-node-card {
+  border-color: color-mix(in srgb, #ef4444 58%, var(--border-soft));
+  background: color-mix(in srgb, #fee2e2 76%, var(--code-bg));
+}
+
+:root[data-theme="dark"] .diagram-node-card {
+  border-color: color-mix(in srgb, #60a5fa 54%, var(--border-soft));
+  background: color-mix(in srgb, rgba(30, 64, 175, 0.44) 70%, var(--code-bg));
+}
+
+:root[data-theme="dark"] .diagram-tree-node-terminal > .diagram-node-card {
+  border-color: color-mix(in srgb, #4ade80 52%, var(--border-soft));
+  background: color-mix(in srgb, rgba(22, 101, 52, 0.42) 72%, var(--code-bg));
+}
+
+:root[data-theme="dark"] .diagram-tree-node-operator > .diagram-node-card,
+:root[data-theme="dark"] .diagram-tree-node-symbol > .diagram-node-card {
+  border-color: color-mix(in srgb, #fbbf24 54%, var(--border-soft));
+  background: color-mix(in srgb, rgba(146, 64, 14, 0.42) 72%, var(--code-bg));
+}
+
+:root[data-theme="dark"] .diagram-tree-node-special > .diagram-node-card {
+  border-color: color-mix(in srgb, #f87171 54%, var(--border-soft));
+  background: color-mix(in srgb, rgba(153, 27, 27, 0.38) 72%, var(--code-bg));
+}
+
+.diagram-node-title {
+  color: color-mix(in srgb, var(--text-strong) 88%, #1d4ed8);
+  font-size: 0.7rem;
+  font-weight: 700;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.diagram-tree-node-terminal .diagram-node-title {
+  color: color-mix(in srgb, var(--text-strong) 86%, #15803d);
+  font-weight: 600;
+}
+
+.diagram-tree-node-operator .diagram-node-title,
+.diagram-tree-node-symbol .diagram-node-title {
+  color: color-mix(in srgb, var(--text-strong) 86%, #b45309);
+  font-weight: 700;
+}
+
+.diagram-tree-node-special .diagram-node-title {
+  color: color-mix(in srgb, var(--text-strong) 86%, #b91c1c);
+}
+
+.diagram-tree-node-parent > .diagram-node-card::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -1.25rem;
+  width: 1px;
+  height: 1.25rem;
+  background: color-mix(in srgb, #334155 58%, var(--border-soft));
+}
+
+.diagram-tree-children {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 1.35rem;
+  padding-top: 2.45rem;
+}
+
+.diagram-tree-children::before {
+  content: "";
+  position: absolute;
+  top: 1.22rem;
+  left: calc(1.9rem + 0.68rem);
+  right: calc(1.9rem + 0.68rem);
+  height: 1px;
+  background: color-mix(in srgb, #334155 58%, var(--border-soft));
+}
+
+.diagram-tree-children-single::before {
+  display: none;
+}
+
+.diagram-tree-children > .diagram-tree-node::before {
+  content: "";
+  position: absolute;
+  top: -1.23rem;
+  left: 50%;
+  width: 1px;
+  height: 1.23rem;
+  background: color-mix(in srgb, #334155 58%, var(--border-soft));
+}
+
 @media (max-width: 640px) {
   .token-modal-card {
     width: 96vw;

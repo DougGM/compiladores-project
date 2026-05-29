@@ -1,16 +1,10 @@
 ﻿import { useEffect, useRef, useState } from "react"
 import { traducir } from "../components/traductor"
+import { ArbolSintactico } from "./ArbolSintactico"
 import { TranslationRules } from "./TranslationRules"
 
 // Calcula cuantas lineas mostrar en el contador y en el gutter lateral.
 const obtenerTotalLineas = (texto) => Math.max(1, texto.split("\n").length)
-
-// Detecta la linea donde el traductor reporta un error sintactico.
-const obtenerLineaConError = (traduccion) => {
-  const lineas = traduccion.split("\n")
-  const indiceError = lineas.findIndex((linea) => linea.trim().startsWith("// Error sint"))
-  return indiceError === -1 ? null : indiceError + 1
-}
 
 const PanelCodigo = ({
   titulo,
@@ -65,6 +59,9 @@ export const Editor = () => {
   const [output, setOutput] = useState("")
   const [listaTokens, setListaTokens] = useState([])
   const [erroresLexicos, setErroresLexicos] = useState([])
+  const [erroresSintacticos, setErroresSintacticos] = useState([])
+  const [arbolSintactico, setArbolSintactico] = useState(null)
+  const [conversionRealizada, setConversionRealizada] = useState(false)
   const [tablaTokensExpandida, setTablaTokensExpandida] = useState(false)
   // const [copyState, setCopyState] = useState("idle")
   const [estadoConversion, setEstadoConversion] = useState({
@@ -121,6 +118,9 @@ export const Editor = () => {
       setOutput("")
       setListaTokens([])
       setErroresLexicos([])
+      setErroresSintacticos([])
+      setArbolSintactico(null)
+      setConversionRealizada(false)
       setEstadoConversion({
         type: "waiting",
         message: "Esperando entrada",
@@ -128,18 +128,33 @@ export const Editor = () => {
       return
     }
 
-    const { codigoJS, listaTokens: tokens, erroresLexicos: errores } = traducir(input)
+    const {
+      codigoJS,
+      listaTokens: tokens,
+      erroresLexicos: errores,
+      erroresSintacticos: erroresSintaxis,
+      arbolSintactico: arbol,
+    } = traducir(input)
     setOutput(codigoJS)
     setListaTokens(tokens)
     setErroresLexicos(errores)
-    setUltimoConvertido({ input, output: codigoJS, tokens, erroresLexicos: errores })
+    setErroresSintacticos(erroresSintaxis)
+    setArbolSintactico(arbol)
+    setConversionRealizada(true)
+    setUltimoConvertido({
+      input,
+      output: codigoJS,
+      tokens,
+      erroresLexicos: errores,
+      erroresSintacticos: erroresSintaxis,
+      arbolSintactico: arbol,
+    })
     // setCopyState("idle")
 
-    const lineaError = obtenerLineaConError(codigoJS)
-    if (lineaError !== null) {
+    if (erroresSintaxis.length > 0) {
       setEstadoConversion({
         type: "error",
-        message: `Error en linea ${lineaError}`,
+        message: `Errores sintacticos: ${erroresSintaxis.length}`,
       })
       return
     }
@@ -164,6 +179,9 @@ export const Editor = () => {
     setOutput("")
     setListaTokens([])
     setErroresLexicos([])
+    setErroresSintacticos([])
+    setArbolSintactico(null)
+    setConversionRealizada(false)
     // setCopyState("idle")
     setEstadoConversion({
       type: "waiting",
@@ -225,13 +243,16 @@ export const Editor = () => {
     setOutput(ultimoConvertido.output)
     setListaTokens(ultimoConvertido.tokens ?? [])
     const erroresGuardados = ultimoConvertido.erroresLexicos ?? []
+    const erroresSintaxisGuardados = ultimoConvertido.erroresSintacticos ?? []
     setErroresLexicos(erroresGuardados)
+    setErroresSintacticos(erroresSintaxisGuardados)
+    setArbolSintactico(ultimoConvertido.arbolSintactico ?? null)
+    setConversionRealizada(true)
 
-    const lineaError = obtenerLineaConError(ultimoConvertido.output)
-    if (lineaError !== null) {
+    if (erroresSintaxisGuardados.length > 0) {
       setEstadoConversion({
         type: "error",
-        message: `Error en linea ${lineaError}`,
+        message: `Errores sintacticos: ${erroresSintaxisGuardados.length}`,
       })
       return
     }
@@ -288,6 +309,14 @@ export const Editor = () => {
         </tbody>
       </table>
     </div>
+  )
+
+  const debeMostrarArbol = (
+    conversionRealizada &&
+    input.trim().length > 0 &&
+    erroresLexicos.length === 0 &&
+    erroresSintacticos.length === 0 &&
+    arbolSintactico
   )
 
   return (
@@ -408,6 +437,58 @@ export const Editor = () => {
             </table>
           </div>
         </section>
+
+        {erroresSintacticos.length > 0 ? (
+          <section className="mt-5 rounded-2xl border border-[var(--border-soft)] bg-[var(--panel-2)] p-3 shadow-[var(--shadow-soft)]">
+            <div className="token-table-header mb-3 flex items-center justify-between gap-2">
+              <h3 className="text-sm font-semibold text-[var(--text-strong)]">Errores Sintácticos</h3>
+              <span className="text-xs font-medium text-[var(--text-muted)]">Total: {erroresSintacticos.length}</span>
+            </div>
+
+            <div className="token-table-wrap">
+              <table className="token-table syntax-error-table">
+                <thead>
+                  <tr>
+                    <th>Error</th>
+                    <th>Línea</th>
+                    <th>Lexema</th>
+                    <th>Tipo</th>
+                    <th>Descripción</th>
+                    <th>Sugerencia</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {erroresSintacticos.map((error) => (
+                    <tr key={`${error.numero}-${error.linea}-${error.lexema}`} className="token-row-error">
+                      <td>{error.numero}</td>
+                      <td>{error.linea}</td>
+                      <td>{error.lexema}</td>
+                      <td>{error.tipo}</td>
+                      <td>{error.descripcion}</td>
+                      <td>{error.sugerencia}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        ) : null}
+
+        {debeMostrarArbol ? (
+          <section className="mt-5 rounded-2xl border border-[var(--border-soft)] bg-[var(--panel-2)] p-3 shadow-[var(--shadow-soft)]">
+            <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h3 className="text-sm font-semibold text-[var(--text-strong)]">Árbol Sintáctico</h3>
+                <p className="mt-1 text-xs font-medium text-[var(--text-muted)]">
+                  Representación estructural del pseudocódigo analizado
+                </p>
+              </div>
+              <span className="status-badge status-success">Estado: Generado</span>
+            </div>
+
+            <ArbolSintactico arbol={arbolSintactico} />
+          </section>
+        ) : null}
       </section>
 
       {tablaTokensExpandida ? (

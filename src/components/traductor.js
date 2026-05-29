@@ -1,6 +1,21 @@
+// ======================================================
+//  TRADUCTOR PSEUDOJS A JAVASCRIPT
+// ======================================================
+// Este archivo contiene la logica principal del traductor.
+// Aqui se realiza el analisis lexico, el analisis sintactico,
+// la construccion del arbol sintactico y la generacion del
+// codigo JavaScript equivalente.
+
 const TOKEN_EOF = "EOF";
 const TOKEN_EOL = "EOL";
 
+// ======================================================
+//  DEFINICION DE PALABRAS RESERVADAS
+// ======================================================
+// Palabras propias del lenguaje PseudoJS. Cada palabra se
+// convierte a un token interno que el parser puede reconocer.
+// Ejemplos: leer, mostrar, si, entonces, sino, fin_si,
+// segun, caso, defecto, para, mientras y hacer.
 const palabrasReservadas = {
   leer: "LEER",
   mostrar: "MOSTRAR",
@@ -22,6 +37,11 @@ const palabrasReservadas = {
   fin_mientras: "FIN_MIENTRAS",
 };
 
+// ======================================================
+//  SIMBOLOS Y OPERADORES PERMITIDOS
+// ======================================================
+// Operadores de asignacion, aritmeticos, relacionales y
+// parentesis reconocidos por el lenguaje.
 const simbolos = {
   "=": "ASIGNACION",
   "+": "SUMA",
@@ -38,6 +58,8 @@ const simbolos = {
   ")": "PARENTESIS_CIERRA",
 };
 
+// Conjuntos usados por el parser para validar condiciones,
+// expresiones y cierres de bloques.
 const operadoresRelacionales = new Set([
   "IGUAL_QUE",
   "DIFERENTE_QUE",
@@ -64,6 +86,11 @@ const tokensCierreBloque = new Set([
   "FIN_MIENTRAS",
 ]);
 
+// ======================================================
+//  DIAGNOSTICO DE ERRORES LEXICOS
+// ======================================================
+// A partir de un lexema no reconocido, genera una descripcion
+// y una sugerencia para mostrar en la interfaz.
 const construirDiagnosticoLexico = (lexema) => {
   if (/^"[^"]*"$/.test(lexema)) {
     return {
@@ -108,6 +135,12 @@ const construirDiagnosticoLexico = (lexema) => {
 
 const crearToken = (token, lexema, linea) => ({ token, lexema, linea });
 
+// ======================================================
+//  ANALISIS LEXICO: TOKENIZACION
+// ======================================================
+// Convierte el codigo fuente en tokens. Tambien detecta errores
+// lexicos como identificadores invalidos, simbolos no permitidos
+// o cadenas mal escritas.
 const tokenizar = (codigo) => {
   const listaTokens = [];
   const tokensParser = [];
@@ -139,6 +172,8 @@ const tokenizar = (codigo) => {
   };
 
   const tokenizarLinea = (texto, linea) => {
+    // Patron principal para localizar cadenas, numeros,
+    // identificadores, operadores y posibles lexemas invalidos.
     const patronLexemas = /"[^"]*"|\d+(?:\.\d+)?[a-zA-Z_][a-zA-Z0-9_]*|==|!=|>=|<=|[=+\-*/()<>]|[a-zA-Z\u00C0-\u00FF_][a-zA-Z0-9\u00C0-\u00FF_]*|\d+\.\d+|\d+/g;
     let cursor = 0;
     let coincidencia = null;
@@ -198,6 +233,12 @@ const tokenizar = (codigo) => {
   };
 };
 
+// ======================================================
+//  ANALISIS SINTACTICO: PARSER PSEUDOJS
+// ======================================================
+// El parser recibe los tokens generados por el analizador lexico
+// y valida si cumplen la BNF del lenguaje. Al mismo tiempo
+// construye un arbol sintactico que representa el pseudocodigo.
 class ParserPseudoJS {
   constructor(tokens) {
     this.tokens = tokens;
@@ -206,6 +247,10 @@ class ParserPseudoJS {
     this.contadorErrores = 0;
   }
 
+  // ------------------------------------------------------
+  // parsePrograma(): <Programa> ::= <Instruccion> { <Instruccion> }
+  // ------------------------------------------------------
+  // Recorre todas las instrucciones hasta llegar al final del archivo.
   parsePrograma() {
     const hijos = [];
     this.consumirSaltosLinea();
@@ -224,6 +269,11 @@ class ParserPseudoJS {
     };
   }
 
+  // ------------------------------------------------------
+  // parseInstruccion(): decide que regla aplicar
+  // ------------------------------------------------------
+  // Segun el token actual, envia el flujo a asignacion, leer,
+  // mostrar, si, segun, para, mientras o hacer.
   parseInstruccion(contexto = {}) {
     this.consumirSaltosLinea();
     const token = this.ver();
@@ -266,6 +316,10 @@ class ParserPseudoJS {
     }
   }
 
+  // ------------------------------------------------------
+  // parseAsignacion(): <Identificador> '=' <Expresion>
+  // ------------------------------------------------------
+  // Valida una asignacion y crea su nodo dentro del arbol.
   parseAsignacion() {
     const identificador = this.consumir("IDENTIFICADOR", "Se esperaba un identificador al inicio de la asignacion.");
     this.consumir("ASIGNACION", "Se esperaba '=' despues del identificador.");
@@ -280,6 +334,10 @@ class ParserPseudoJS {
     };
   }
 
+  // ------------------------------------------------------
+  // parseEntradaDatos(): leer <Identificador>
+  // ------------------------------------------------------
+  // Reconoce instrucciones de entrada de datos.
   parseEntradaDatos() {
     const inicio = this.consumir("LEER", "Se esperaba la palabra reservada leer.");
     const identificador = this.consumir("IDENTIFICADOR", "La instruccion leer necesita un identificador.");
@@ -292,6 +350,10 @@ class ParserPseudoJS {
     };
   }
 
+  // ------------------------------------------------------
+  // parseSalidaDatos(): mostrar <Expresion>
+  // ------------------------------------------------------
+  // Reconoce instrucciones de salida hacia consola.
   parseSalidaDatos() {
     const inicio = this.consumir("MOSTRAR", "Se esperaba la palabra reservada mostrar.");
     const expresion = this.parseExpresion(new Set([TOKEN_EOL, TOKEN_EOF]));
@@ -304,6 +366,11 @@ class ParserPseudoJS {
     };
   }
 
+  // ------------------------------------------------------
+  // parseCondicionalSi(): estructura si / sino / fin_si
+  // ------------------------------------------------------
+  // Reconoce condicionales con bloque entonces obligatorio y
+  // bloque sino opcional.
   parseCondicionalSi() {
     const inicio = this.consumir("SI", "Se esperaba la palabra reservada si.");
     const condicion = this.parseCondicion(new Set(["ENTONCES", TOKEN_EOL, TOKEN_EOF]));
@@ -358,6 +425,10 @@ class ParserPseudoJS {
     };
   }
 
+  // ------------------------------------------------------
+  // parseEstructuraSegun(): segun / caso / defecto / fin_segun
+  // ------------------------------------------------------
+  // Reconoce estructuras de seleccion multiple.
   parseEstructuraSegun() {
     const inicio = this.consumir("SEGUN", "Se esperaba la palabra reservada segun.");
     const identificador = this.consumir("IDENTIFICADOR", "La estructura segun necesita un identificador.");
@@ -416,6 +487,7 @@ class ParserPseudoJS {
     };
   }
 
+  // Reconoce una rama caso dentro de una estructura segun.
   parseCaso() {
     const inicio = this.consumir("CASO", "Se esperaba la palabra reservada caso.");
     const valor = this.parseValor();
@@ -440,6 +512,7 @@ class ParserPseudoJS {
     };
   }
 
+  // Reconoce el bloque defecto opcional dentro de segun.
   parseDefecto() {
     const inicio = this.consumir("DEFECTO", "Se esperaba la palabra reservada defecto.");
     this.esperarFinDeLinea("La palabra defecto debe ir sola en su linea.");
@@ -460,6 +533,10 @@ class ParserPseudoJS {
     };
   }
 
+  // ------------------------------------------------------
+  // parseCicloPara(): ciclo para con y sin paso
+  // ------------------------------------------------------
+  // Valida los limites, el paso opcional y el bloque interno.
   parseCicloPara() {
     const inicio = this.consumir("PARA", "Se esperaba la palabra reservada para.");
     const identificador = this.consumir("IDENTIFICADOR", "El ciclo para necesita un identificador.");
@@ -509,6 +586,11 @@ class ParserPseudoJS {
     };
   }
 
+  // ------------------------------------------------------
+  // parseCicloMientras(): mientras <Condicion> hacer ... fin_mientras
+  // ------------------------------------------------------
+  // Reconoce ciclos mientras y diferencia el uso ambiguo con
+  // hacer-mientras.
   parseCicloMientras(contexto = {}) {
     const inicio = this.consumir("MIENTRAS", "Se esperaba la palabra reservada mientras.");
     const condicion = this.parseCondicion(new Set(["HACER", TOKEN_EOL, TOKEN_EOF]));
@@ -567,6 +649,11 @@ class ParserPseudoJS {
     };
   }
 
+  // ------------------------------------------------------
+  // parseCicloHacerMientras(): hacer ... mientras <Condicion>
+  // ------------------------------------------------------
+  // Reconoce el ciclo que ejecuta primero el bloque y evalua
+  // la condicion al final.
   parseCicloHacerMientras() {
     const inicio = this.consumir("HACER", "Se esperaba la palabra reservada hacer.");
     this.esperarFinDeLinea("La palabra hacer debe ir sola en su linea.");
@@ -611,6 +698,12 @@ class ParserPseudoJS {
     };
   }
 
+  // ------------------------------------------------------
+  // parseBloqueInstrucciones(): conjunto de instrucciones internas
+  // ------------------------------------------------------
+  // Lee instrucciones hasta encontrar el token de cierre indicado.
+  // Tambien puede reportar bloques vacios cuando una estructura
+  // requiere al menos una instruccion.
   parseBloqueInstrucciones(debeDetenerse, bloqueRequerido = null) {
     const instrucciones = [];
     this.consumirSaltosLinea();
@@ -636,6 +729,10 @@ class ParserPseudoJS {
     return instrucciones;
   }
 
+  // ------------------------------------------------------
+  // parseCondicion(): <Expresion> <OperadorRelacional> <Expresion>
+  // ------------------------------------------------------
+  // Valida condiciones usadas en si, mientras y hacer-mientras.
   parseCondicion(detenciones) {
     const izquierda = this.parseExpresion(new Set([...detenciones, ...operadoresRelacionales]));
     const operador = this.ver();
@@ -662,6 +759,11 @@ class ParserPseudoJS {
     };
   }
 
+  // ------------------------------------------------------
+  // parseExpresion(), parseTermino() y parseValor()
+  // ------------------------------------------------------
+  // Procesan expresiones aritmeticas, valores simples y terminos
+  // agrupados con parentesis.
   parseExpresion(detenciones) {
     const terminos = [this.parseTermino(detenciones)];
     const operadores = [];
@@ -682,6 +784,7 @@ class ParserPseudoJS {
     };
   }
 
+  // Reconoce un termino: valor simple o expresion entre parentesis.
   parseTermino(detenciones) {
     if (this.es("PARENTESIS_ABRE")) {
       const apertura = this.avanzar();
@@ -698,6 +801,7 @@ class ParserPseudoJS {
     return this.parseValor();
   }
 
+  // Reconoce valores terminales: identificadores, numeros y cadenas.
   parseValor() {
     const token = this.ver();
 
@@ -731,6 +835,7 @@ class ParserPseudoJS {
     return this.crearNodoExpresionVacio(token.linea);
   }
 
+  // Reconoce numeros usados en reglas como el ciclo para.
   parseNumero() {
     const token = this.ver();
     if (token.token === "ENTERO" || token.token === "DECIMAL") {
@@ -753,6 +858,7 @@ class ParserPseudoJS {
     return this.crearNodoExpresionVacio(token.linea);
   }
 
+  // Reconoce numeros con signo para la clausula paso del ciclo para.
   parseNumeroConSigno() {
     let signo = "";
     if (this.es("SUMA") || this.es("RESTA")) {
@@ -767,6 +873,12 @@ class ParserPseudoJS {
     };
   }
 
+  // ======================================================
+  //  MANEJO DE ERRORES SINTACTICOS
+  // ======================================================
+  // Estas funciones registran errores con linea, lexema, tipo,
+  // descripcion y sugerencia. Tambien ayudan a sincronizar el
+  // parser para continuar analizando despues de un error.
   consumir(tokenEsperado, mensaje) {
     if (this.es(tokenEsperado)) {
       return this.avanzar();
@@ -884,6 +996,11 @@ class ParserPseudoJS {
   }
 }
 
+// ======================================================
+//  CONVERSION DE EXPRESIONES DEL ARBOL A CODIGO
+// ======================================================
+// Convierte nodos de expresion del arbol sintactico a texto
+// JavaScript reutilizable por el generador de codigo.
 const expresionACodigo = (nodo) => {
   if (!nodo) return "";
 
@@ -907,6 +1024,12 @@ const expresionACodigo = (nodo) => {
   }
 };
 
+// ======================================================
+//  GENERACION DE CODIGO JAVASCRIPT
+// ======================================================
+// Recorre el arbol sintactico del pseudocodigo y produce el
+// codigo JavaScript equivalente. El arbol representa PseudoJS,
+// no la estructura interna de JavaScript.
 const generarJavaScript = (arbolSintactico, erroresSintacticos) => {
   const variablesDeclaradas = new Set();
 
@@ -1006,6 +1129,12 @@ const generarJavaScript = (arbolSintactico, erroresSintacticos) => {
   return lineas.join("\n");
 };
 
+// ======================================================
+//  FUNCION PRINCIPAL EXPORTADA
+// ======================================================
+// Esta es la funcion publica usada por React. Ejecuta todo el
+// flujo del traductor y devuelve codigoJS, listaTokens,
+// erroresLexicos, erroresSintacticos y arbolSintactico.
 export function traducir(codigo) {
   const { listaTokens, tokensParser, erroresLexicos } = tokenizar(codigo);
   const parser = new ParserPseudoJS(tokensParser);
